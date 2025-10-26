@@ -45,9 +45,28 @@ services:
       - bizconnect-network
     restart: unless-stopped
 
-# 볼륨 정의 (DB 데이터 영속성)
+  # Jenkins 서비스 (새로 추가!)
+  jenkins:
+    image: jenkins/jenkins:lts-jdk21
+    container_name: bizconnect-jenkins
+    privileged: true
+    user: root
+    ports:
+      - "9090:8080"      # Jenkins UI
+      - "50000:50000"    # Jenkins Agent
+    volumes:
+      - jenkins-data:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./:/workspace
+    networks:
+      - bizconnect-network
+    restart: unless-stopped
+
+# 볼륨 정의
 volumes:
   mariadb-data:
+    driver: local
+  jenkins-data:      # Jenkins 데이터 볼륨 추가
     driver: local
 
 # 네트워크 정의
