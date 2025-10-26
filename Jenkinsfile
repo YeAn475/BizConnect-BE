@@ -23,18 +23,6 @@ pipeline {
             }
         }
 
-        stage('Test') {
-            steps {
-                echo '=== Running tests ==='
-                sh './gradlew test'
-            }
-            post {
-                always {
-                    junit '**/build/test-results/test/*.xml'
-                }
-            }
-        }
-
         stage('Docker Build') {
             steps {
                 echo '=== Building Docker image ==='

@@ -52,8 +52,8 @@ services:
     privileged: true
     user: root
     ports:
-      - "9090:8080"      # Jenkins UI
-      - "50000:50000"    # Jenkins Agent
+      - "9090:8080"
+      - "50000:50000"
     volumes:
       - jenkins-data:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
@@ -61,6 +61,12 @@ services:
     networks:
       - bizconnect-network
     restart: unless-stopped
+    entrypoint: >
+      /bin/bash -c "
+      apt-get update &&
+      apt-get install -y docker.io curl &&
+      /usr/bin/tini -- /usr/local/bin/jenkins.sh
+      "
 
 # 볼륨 정의
 volumes:
