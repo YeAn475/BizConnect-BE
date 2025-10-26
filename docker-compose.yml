@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  # MariaDB 서비스
+  mariadb:
+    image: mariadb:10.11
+    container_name: bizconnect-mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: root1234
+      MYSQL_DATABASE: bizconnect
+      MYSQL_USER: lsh
+      MYSQL_PASSWORD: lsh
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    networks:
+      - bizconnect-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # BizConnect Application 서비스
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bizconnect-app
+    environment:
+      SPRING_PROFILE: dev
+      SERVER_PORT: 8301
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_NAME: bizconnect
+      DB_USERNAME: lsh
+      DB_PASSWORD: lsh
+    ports:
+      - "8301:8301"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    networks:
+      - bizconnect-network
+    restart: unless-stopped
+
+# 볼륨 정의 (DB 데이터 영속성)
+volumes:
+  mariadb-data:
+    driver: local
+
+# 네트워크 정의
+networks:
+  bizconnect-network:
+    driver: bridge
