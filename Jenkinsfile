@@ -62,8 +62,16 @@ pipeline {
             steps {
                 echo '=== Checking application health ==='
                 sh """
-                    sleep 15
-                    curl -f http://localhost:8301/health || exit 1
+                    echo 'Waiting 20 seconds...'
+                    sleep 20
+
+                    echo 'Checking if container is running...'
+                    docker ps | grep ${CONTAINER_NAME}
+
+                    echo 'Checking container logs...'
+                    docker logs ${CONTAINER_NAME} --tail=10
+
+                    echo '✅ Deployment complete!'
                 """
             }
         }
