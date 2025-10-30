@@ -1,7 +1,4 @@
-version: '3.8'
-
 services:
-  # MariaDB 서비스
   mariadb:
     image: mariadb:10.11
     container_name: bizconnect-mariadb
@@ -11,7 +8,7 @@ services:
       MYSQL_USER: lsh
       MYSQL_PASSWORD: lsh
     ports:
-      - "3306:3306"
+      - "3307:3306"  # 로컬 3306과 충돌 안 나게
     volumes:
       - mariadb-data:/var/lib/mysql
     networks:
@@ -22,14 +19,13 @@ services:
       timeout: 5s
       retries: 5
 
-  # BizConnect Application 서비스
   app:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: bizconnect-app
     environment:
-      SPRING_PROFILE: dev
+      SPRING_PROFILE: prod  # Prod 환경
       SERVER_PORT: 8301
       DB_HOST: mariadb
       DB_PORT: 3306
@@ -45,7 +41,6 @@ services:
       - bizconnect-network
     restart: unless-stopped
 
-  # Jenkins 서비스 (새로 추가!)
   jenkins:
     image: jenkins/jenkins:lts-jdk21
     container_name: bizconnect-jenkins
@@ -68,14 +63,12 @@ services:
       /usr/bin/tini -- /usr/local/bin/jenkins.sh
       "
 
-# 볼륨 정의
 volumes:
   mariadb-data:
     driver: local
-  jenkins-data:      # Jenkins 데이터 볼륨 추가
+  jenkins-data:
     driver: local
 
-# 네트워크 정의
 networks:
   bizconnect-network:
     driver: bridge
