@@ -33,16 +33,16 @@ public class JwtTokenProvider {
      */
 
     // access 토큰 생성
-    public String createToken(String email, String role) {
-        return createToken(email, role, jwtProperties.getRefreshTokenExpiration());
+    public String createAccessToken(String email, String role) {
+        return createAccessToken(email, role, jwtProperties.getRefreshTokenExpiration());
     }
 
     // refresh 토큰 생성
     public String createRefreshToken(String email, String role) {
-        return createToken(email, role, jwtProperties.getRefreshTokenExpiration());
+        return createAccessToken(email, role, jwtProperties.getRefreshTokenExpiration());
     }
 
-    private String createToken(String email, String role, long expiration) {
+    private String createAccessToken(String email, String role, long expiration) {
         Date now = new Date();
         Date expriedate = new Date(now.getTime() + expiration); // 현재 시간에 expiration을 더한 값을 저장
 

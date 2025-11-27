@@ -1,12 +1,13 @@
-package com.springboot.bizconnect.domain.user.service;
+package com.springboot.bizconnect.domain.user.service.impl;
 
-import com.springboot.bizconnect.domain.user.dto.Sign.SignupRequestDto;
-import com.springboot.bizconnect.domain.user.dto.Sign.SignupResponseDto;
+import com.springboot.bizconnect.domain.user.dto.sign.SignupRequestDto;
+import com.springboot.bizconnect.domain.user.dto.sign.SignupResponseDto;
 import com.springboot.bizconnect.domain.user.repository.CompanyRepository;
 import com.springboot.bizconnect.domain.user.repository.PositionRepository;
 import com.springboot.bizconnect.domain.user.repository.RoleRepository;
 import com.springboot.bizconnect.domain.user.repository.UserRepository;
 import com.springboot.bizconnect.domain.user.repository.UserStatusRepository;
+import com.springboot.bizconnect.domain.user.service.UserService;
 import com.springboot.bizconnect.entity.Company;
 import com.springboot.bizconnect.entity.Position;
 import com.springboot.bizconnect.entity.Role;
@@ -29,7 +30,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public SignupResponseDto addUser(SignupRequestDto requestDto) {
+    public SignupResponseDto signup(SignupRequestDto requestDto) {
         if (userRepository.existsByEmail(requestDto.getEmail())) throw new RuntimeException("이미 존재하는 이메일입니다.");
 
         if(!requestDto.getPassword().equals(requestDto.getPasswordConfirm())) throw new RuntimeException("비밀번호가 일치하지 않습니다.");

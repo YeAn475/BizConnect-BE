@@ -1,4 +1,4 @@
-package com.springboot.bizconnect.domain.user.dto.Sign;
+package com.springboot.bizconnect.domain.user.dto.sign;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
