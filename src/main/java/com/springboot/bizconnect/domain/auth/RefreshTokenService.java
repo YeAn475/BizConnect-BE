@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
-public class RefreshTokenSeravice {
+public class RefreshTokenService {
 
     private final RedisTemplate<String, String> redisTemplate;
     private static final long REFRESH_TOKEN_EXPIRATION = 60 * 60 * 24 * 7; // 7일
