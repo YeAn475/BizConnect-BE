@@ -1,5 +1,7 @@
 package com.springboot.bizconnect.config;
 
+import com.springboot.bizconnect.domain.auth.jwt.JwtAuthenticationFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -12,7 +14,10 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
     /*
         SecurityFilterChain : 모든 HTTP 요청이 거쳐가는 보안 필터 체인(이 요청은 통과시켜, 막아 이런 규칙을 정의한 값은 리턴함)
         HttpSecurity : 보안 설정을 도와주는 도구(이걸로 규칙을 설정함)

@@ -14,6 +14,7 @@ import com.springboot.bizconnect.entity.User;
 import com.springboot.bizconnect.entity.UserStatus;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,6 +25,7 @@ public class UserServiceImpl implements UserService {
     private final PositionRepository positionRepository;
     private final UserStatusRepository userStatusRepository;
     private final CompanyRepository companyRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -41,10 +43,11 @@ public class UserServiceImpl implements UserService {
         Company defaultCompany = companyRepository.findById(1L)
                 .orElseThrow(() -> new RuntimeException("Company를 찾을 수 없습니다."));
 
+
         User user = User.builder()
                 .name(requestDto.getName())
                 .email(requestDto.getEmail())
-                .password(requestDto.getPassword())
+                .password(passwordEncoder.encode(requestDto.getPassword()))
                 .phoneNumber(requestDto.getPhoneNumber())
                 .address(requestDto.getAddress())
                 .role(defaultRole)
