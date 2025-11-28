@@ -32,7 +32,7 @@ public class User extends BaseEntity {
     @Column(name = "user_no", nullable = false)
     private Integer userNo;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_no", nullable = false)
     private Role role;
 

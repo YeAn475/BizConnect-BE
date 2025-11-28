@@ -1,5 +1,6 @@
 package com.springboot.bizconnect.domain.auth.service.impl;
 
+import com.springboot.bizconnect.domain.auth.RefreshTokenService;
 import com.springboot.bizconnect.domain.auth.dto.login.LoginRequestDto;
 import com.springboot.bizconnect.domain.auth.dto.login.LoginResponseDto;
 import com.springboot.bizconnect.domain.auth.jwt.JwtTokenProvider;
@@ -17,6 +18,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RefreshTokenService refreshTokenService;
 
     @Override
     public LoginResponseDto login(LoginRequestDto loginRequestDto) {
@@ -28,9 +30,59 @@ public class AuthServiceImpl implements AuthService {
         String accessToken = jwtTokenProvider.createAccessToken(user.getEmail(), user.getRole().getName());
         String refreshToken = jwtTokenProvider.createRefreshToken(user.getEmail(), user.getRole().getName());
 
+        // 로그 추가
+        System.out.println("=== 로그인 ===");
+        System.out.println("이메일: " + user.getEmail());
+        System.out.println("Refresh Token 저장: " + refreshToken);
+
+        refreshTokenService.saveRefreshToken(user.getEmail(), refreshToken);
+
+        // 저장 확인
+        String savedToken = refreshTokenService.getRefreshToken(user.getEmail());
+        System.out.println("Redis에서 조회한 토큰: " + savedToken);
+        System.out.println("일치 여부: " + refreshToken.equals(savedToken));
+
         return LoginResponseDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
+    }
+
+    @Override
+    public LoginResponseDto refresh(String refreshToken) {
+
+        refreshToken = refreshToken.trim().replace("\"", "");
+
+        // 토큰 유효성 검사
+        if(!jwtTokenProvider.validateToken(refreshToken)) {
+            throw new RuntimeException("Refresh 토큰이 일치하지 않습니다.");
+        }
+
+        // 토큰에서 이메일 추출
+        String email = jwtTokenProvider.getEmail(refreshToken);
+
+        // Redis에 저장된 토큰과 비교
+        if(!refreshTokenService.validateRefreshToken(email, refreshToken)) {
+            throw new RuntimeException("Refresh 토큰이 일치하지 않습니다.");
+        }
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
+
+        String newAccessToken = jwtTokenProvider.createAccessToken(user.getEmail(), user.getRole().getName());
+        String newRefreshToken = jwtTokenProvider.createRefreshToken(user.getEmail(), user.getRole().getName());
+
+        // new Refresh 토큰 redis에 저장
+        refreshTokenService.saveRefreshToken(email, newRefreshToken);
+
+        return LoginResponseDto.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(newRefreshToken)
+                .build();
+    }
+
+    @Override
+    public void logout(String email) {
+        refreshTokenService.deleteRefreshToken(email);
     }
 }
