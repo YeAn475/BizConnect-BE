@@ -92,7 +92,6 @@ public class UserControllerImpl implements UserController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody @Valid ProfileRequestDto requestDto
     ) {
-        Long userNo = userDetails.getUser().getUserNo();
         ProfileResponseDto responseDto = userService.updateProfile(userDetails, requestDto);
         return ResponseEntity.ok(responseDto);
     }

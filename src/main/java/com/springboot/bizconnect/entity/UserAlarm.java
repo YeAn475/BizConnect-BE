@@ -8,9 +8,11 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,15 +20,15 @@ import lombok.Setter;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "chat_join")
+@Table(name = "user_alarm")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChatJoin {
+public class UserAlarm {
     @EmbeddedId
-    private chatJoinNo no;
+    private userAlarmNo no;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("userNo")
@@ -34,20 +36,23 @@ public class ChatJoin {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("chatroomNo")
-    @JoinColumn(name = "chatroom_no")
-    private Chatroom chatroom;
+    @MapsId("alarmNo")
+    @JoinColumn(name = "alarm_no")
+    private Alarm alarm;
 
-    @Column(name = "last_read_message_no")
-    private Integer lastReadMessageNo;
+    @Column(name = "is_read", nullable = false)
+    private Boolean isRead = Boolean.FALSE;
+
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted = Boolean.FALSE;
 
     @Embeddable
-    public static class chatJoinNo implements Serializable {
-        @Column(name = "user_no", nullable = false)
-        private Integer userNo;
-
-        @Column(name = "chatroom_no", nullable = false)
-        private Integer chatroomNo;
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @EqualsAndHashCode
+    public static class userAlarmNo implements Serializable {
+        private Long userNo;
+        private Long alarmNo;
     }
 
 }

@@ -29,11 +29,11 @@ public class Alarm {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "alarm_no", nullable = false)
-    private Integer alarmNo;
+    private Long alarmNo;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_no", nullable = false)
-    private User user;
+    @JoinColumn(name = "sender_user_no")
+    private User senderUserNo;
 
     @Column(name = "title", length = 255, nullable = false)
     private String title;
@@ -41,19 +41,8 @@ public class Alarm {
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "is_read", nullable = false)
-    private Boolean isRead = Boolean.FALSE;
-
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "is_deleted", nullable = false)
-    private Boolean isDeleted = Boolean.FALSE;
-
-    @Column(name = "sender_user_no", nullable = true)
-    private Integer senderUserNo;
-
-    @Column(name = "sender_company_no", nullable = true)
-    private Integer senderCompanyNo;
 }
