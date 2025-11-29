@@ -1,7 +1,12 @@
 package com.springboot.bizconnect.domain.user.controller.impl;
 
 
+import com.springboot.bizconnect.domain.auth.CustomUserDetails;
 import com.springboot.bizconnect.domain.user.controller.UserController;
+import com.springboot.bizconnect.domain.user.dto.password.PasswordRequestDto;
+import com.springboot.bizconnect.domain.user.dto.password.PasswordResponseDto;
+import com.springboot.bizconnect.domain.user.dto.profile.ProfileRequestDto;
+import com.springboot.bizconnect.domain.user.dto.profile.ProfileResponseDto;
 import com.springboot.bizconnect.domain.user.dto.sign.SignupRequestDto;
 import com.springboot.bizconnect.domain.user.dto.sign.SignupResponseDto;
 import com.springboot.bizconnect.domain.user.service.UserService;
@@ -14,7 +19,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,5 +61,70 @@ public class UserControllerImpl implements UserController {
     public ResponseEntity<SignupResponseDto> signup(@RequestBody @Valid SignupRequestDto requestDto) {
         SignupResponseDto responseDto = userService.signup(requestDto);
         return ResponseEntity.ok(responseDto);
+    }
+
+    @Override
+    @PatchMapping("/profile")
+    @Operation(summary = "프로필 수정", description = "유저가 프로필을 수정합니다.")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "OK",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ProfileResponseDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json")
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "INTERNAL SERVER ERROR",
+                    content = @Content(mediaType = "application/json")
+            )
+    })
+    public ResponseEntity<ProfileResponseDto> updateProfile(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody @Valid ProfileRequestDto requestDto
+    ) {
+        Long userNo = userDetails.getUser().getUserNo();
+        ProfileResponseDto responseDto = userService.updateProfile(userDetails, requestDto);
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @Override
+    @PutMapping("/password")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "OK",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = PasswordResponseDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json")
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "INTERNAL SERVER ERROR",
+                    content = @Content(mediaType = "application/json")
+            )
+    })
+    public ResponseEntity<PasswordRequestDto> updatePassword(PasswordRequestDto requestDto) {
+        PasswordRequestDto responseDto = userService.updatePassword(requestDto);
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @Override
+    @PutMapping("/prifle/change")
+    public ResponseEntity<String> changeProfileOpen() {
+        return null;
     }
 }

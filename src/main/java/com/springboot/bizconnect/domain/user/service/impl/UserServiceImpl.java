@@ -1,5 +1,9 @@
 package com.springboot.bizconnect.domain.user.service.impl;
 
+import com.springboot.bizconnect.domain.auth.CustomUserDetails;
+import com.springboot.bizconnect.domain.user.dto.password.PasswordRequestDto;
+import com.springboot.bizconnect.domain.user.dto.profile.ProfileRequestDto;
+import com.springboot.bizconnect.domain.user.dto.profile.ProfileResponseDto;
 import com.springboot.bizconnect.domain.user.dto.sign.SignupRequestDto;
 import com.springboot.bizconnect.domain.user.dto.sign.SignupResponseDto;
 import com.springboot.bizconnect.domain.user.repository.CompanyRepository;
@@ -63,5 +67,37 @@ public class UserServiceImpl implements UserService {
                 .message("회원가입을 성공했습니다.")
                 .build();
 
+    }
+
+    @Override
+    public ProfileResponseDto updateProfile(CustomUserDetails userDetails, ProfileRequestDto requestDto) {
+        Long userNo = Long.valueOf(userDetails.getUser().getUserNo());
+
+        User user = userRepository.findById(userNo)
+                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
+
+        if(requestDto.getPhoneNumber() != null) user.setPhoneNumber(requestDto.getPhoneNumber());
+        if(requestDto.getAddress() != null) user.setAddress(requestDto.getAddress());
+
+        User savedUser = userRepository.save(user);
+
+        return ProfileResponseDto.builder()
+                .name(savedUser.getName())
+                .email(savedUser.getEmail())
+                .phoneNumber(savedUser.getPhoneNumber())
+                .address(savedUser.getAddress())
+                .createdAt(savedUser.getCreatedAt())
+                .updatedAt(savedUser.getUpdatedAt())
+                .build();
+    }
+
+    @Override
+    public PasswordRequestDto updatePassword(PasswordRequestDto requestDto) {
+        return null;
+    }
+
+    @Override
+    public String ChangePassword() {
+        return "";
     }
 }

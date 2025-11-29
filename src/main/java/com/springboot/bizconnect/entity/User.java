@@ -30,7 +30,7 @@ public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_no", nullable = false)
-    private Integer userNo;
+    private Long userNo;
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_no", nullable = false)
