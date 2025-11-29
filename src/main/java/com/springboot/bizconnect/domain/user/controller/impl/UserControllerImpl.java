@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/user")
 @Tag(name = "User", description = "유저 관련 API")
@@ -97,6 +99,7 @@ public class UserControllerImpl implements UserController {
 
     @Override
     @PutMapping("/password")
+    @Operation(summary = "비밀번호 변경", description = "유저가 비밀번호를 수정합니다.")
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",
@@ -117,14 +120,67 @@ public class UserControllerImpl implements UserController {
                     content = @Content(mediaType = "application/json")
             )
     })
-    public ResponseEntity<PasswordRequestDto> updatePassword(PasswordRequestDto requestDto) {
-        PasswordRequestDto responseDto = userService.updatePassword(requestDto);
+    public ResponseEntity<PasswordResponseDto> updatePassword(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody @Valid PasswordRequestDto requestDto
+    ) {
+        PasswordResponseDto responseDto = userService.updatePassword(userDetails, requestDto);
         return ResponseEntity.ok(responseDto);
     }
 
     @Override
     @PutMapping("/prifle/change")
-    public ResponseEntity<String> changeProfileOpen() {
-        return null;
+    @Operation(summary = "프로필 공개 여부 변경", description = "유저가 프로필 공개 여부를 변경합니다.")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "OK",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = String.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json")
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "INTERNAL SERVER ERROR",
+                    content = @Content(mediaType = "application/json")
+            )
+    })
+    public ResponseEntity<String> changeProfileOpen(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        String message = userService.ChangePassword(userDetails);
+        return ResponseEntity.ok(message);
+    }
+
+    @Override
+    @PutMapping("/account/delete")
+    @Operation(summary = "계정 탈퇴", description = "유저가 계정을 탈퇴합니다.")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "OK",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = String.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json")
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "INTERNAL SERVER ERROR",
+                    content = @Content(mediaType = "application/json")
+            )
+    })
+    public ResponseEntity<Map<String, String>> deleteAccount(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        String message = userService.deleteAccount(userDetails);
+        return ResponseEntity.ok(Map.of("message", message));
     }
 }

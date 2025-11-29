@@ -25,22 +25,14 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmail(loginRequestDto.getEmail())
                 .orElseThrow(() -> new RuntimeException("사용자 정보가 존재하지 않습니다."));
 
+        if(user.getIsDeleted()) throw new RuntimeException("존재하지 않는 계정입니다.");
+
         if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPassword())) throw new RuntimeException("비밀번호가 일치하지 않습니다.");
 
         String accessToken = jwtTokenProvider.createAccessToken(user.getEmail(), user.getRole().getName());
         String refreshToken = jwtTokenProvider.createRefreshToken(user.getEmail(), user.getRole().getName());
 
-        // 로그 추가
-        System.out.println("=== 로그인 ===");
-        System.out.println("이메일: " + user.getEmail());
-        System.out.println("Refresh Token 저장: " + refreshToken);
-
         refreshTokenService.saveRefreshToken(user.getEmail(), refreshToken);
-
-        // 저장 확인
-        String savedToken = refreshTokenService.getRefreshToken(user.getEmail());
-        System.out.println("Redis에서 조회한 토큰: " + savedToken);
-        System.out.println("일치 여부: " + refreshToken.equals(savedToken));
 
         return LoginResponseDto.builder()
                 .accessToken(accessToken)
