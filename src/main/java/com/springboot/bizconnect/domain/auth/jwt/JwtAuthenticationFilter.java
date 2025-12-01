@@ -31,7 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { // OncePerRe
         String token = jwtTokenProvider.resolveToken(bearerToken); // bearer을 제외한 나머지 순수 토큰값을 가져옴
 
         // 토큰 유효성 검증
-        if(token != null || jwtTokenProvider.validateToken(token)) { // validateToken(JwtTokenProvider에서 유효성 검사 메소드) 토큰 유효성 검사
+        if(token != null && jwtTokenProvider.validateToken(token)) { // validateToken(JwtTokenProvider에서 유효성 검사 메소드) 토큰 유효성 검사
             // 토큰에서 이메일 추출
             String email = jwtTokenProvider.getEmail(token); // 토큰에서 이메일을 가져옴
 
