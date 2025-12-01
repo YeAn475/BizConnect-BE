@@ -1,10 +1,13 @@
-package com.springboot.bizconnect.domain.Alarm.service.Impl;
+package com.springboot.bizconnect.domain.alarm.service.Impl;
 
-import com.springboot.bizconnect.domain.Alarm.dto.Create.CreateAlarmRequestDto;
-import com.springboot.bizconnect.domain.Alarm.dto.Create.CreateAlarmResponseDto;
-import com.springboot.bizconnect.domain.Alarm.repository.AlarmRepository;
-import com.springboot.bizconnect.domain.Alarm.repository.UserAlarmRepository;
-import com.springboot.bizconnect.domain.Alarm.service.AlarmService;
+import com.springboot.bizconnect.domain.alarm.dto.create.CreateAlarmRequestDto;
+import com.springboot.bizconnect.domain.alarm.dto.create.CreateAlarmResponseDto;
+import com.springboot.bizconnect.domain.alarm.dto.list.AlarmListRequestDto;
+import com.springboot.bizconnect.domain.alarm.dto.list.AlarmListResponseDto;
+import com.springboot.bizconnect.domain.alarm.dto.read.ReadAlarmResponseDto;
+import com.springboot.bizconnect.domain.alarm.repository.AlarmRepository;
+import com.springboot.bizconnect.domain.alarm.repository.UserAlarmRepository;
+import com.springboot.bizconnect.domain.alarm.service.AlarmService;
 import com.springboot.bizconnect.domain.auth.CustomUserDetails;
 import com.springboot.bizconnect.domain.user.repository.UserRepository;
 import com.springboot.bizconnect.entity.Alarm;
@@ -12,11 +15,14 @@ import com.springboot.bizconnect.entity.User;
 import com.springboot.bizconnect.entity.UserAlarm;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -200,5 +206,63 @@ public class AlarmServiceImpl implements AlarmService {
                     .isDeleted(false)
                     .build());
         }
+    }
+
+    @Override
+    public List<AlarmListResponseDto> getAlarmList(CustomUserDetails userDetails, @ParameterObject AlarmListRequestDto requestDto) {
+        PageRequest pageRequest = PageRequest.of(requestDto.getPage(), requestDto.getSize());
+
+        return userAlarmRepository.findByUser_UserNoAndIsDeletedFalse(
+                        userDetails.getUser().getUserNo(),
+                        pageRequest
+                )
+                .map(userAlarm -> {
+                    Alarm alarm = userAlarm.getAlarm();
+                    String truncatedContent = alarm.getContent().length() > 10
+                            ? alarm.getContent().substring(0, 10) + "..."
+                            : alarm.getContent();
+
+                    return new AlarmListResponseDto(
+                            alarm.getAlarmNo(),
+                            alarm.getTitle(),
+                            truncatedContent
+                    );
+                })
+                .getContent();
+    }
+
+    @Override
+    public ReadAlarmResponseDto readAlarm(CustomUserDetails userDetails, Long alarmNo) {
+        Long userNo = userDetails.getUser().getUserNo();
+
+        // 1. UserAlarm 조회 (본인 것인지 자동 확인)
+        UserAlarm userAlarm = userAlarmRepository
+                .findByUser_UserNoAndAlarm_AlarmNo(userNo, alarmNo)
+                .orElseThrow(() -> new RuntimeException("없는 알람입니다."));
+
+        // 2. 읽음 처리
+        userAlarm.setIsRead(true);
+        userAlarmRepository.save(userAlarm);
+
+        // 3. Alarm 정보 리턴
+        Alarm alarm = userAlarm.getAlarm();
+
+        return ReadAlarmResponseDto.builder()
+                .alarmNo(alarm.getAlarmNo())
+                .title(alarm.getTitle())
+                .content(alarm.getContent())
+                .build();
+    }
+
+    @Override
+    public void deleteAlarm(CustomUserDetails userDetails, Long alarmNo) {
+        Long userNo = userDetails.getUser().getUserNo();
+
+        UserAlarm userAlarm = userAlarmRepository
+                .findByUser_UserNoAndAlarm_AlarmNo(userNo, alarmNo)
+                .orElseThrow(() -> new RuntimeException("없는 알람입니다."));
+
+        userAlarm.setIsDeleted(true);
+        userAlarmRepository.save(userAlarm);
     }
 }

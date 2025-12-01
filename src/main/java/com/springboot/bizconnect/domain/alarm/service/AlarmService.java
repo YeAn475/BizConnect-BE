@@ -1,7 +1,10 @@
-package com.springboot.bizconnect.domain.Alarm.service;
+package com.springboot.bizconnect.domain.alarm.service;
 
-import com.springboot.bizconnect.domain.Alarm.dto.Create.CreateAlarmRequestDto;
-import com.springboot.bizconnect.domain.Alarm.dto.Create.CreateAlarmResponseDto;
+import com.springboot.bizconnect.domain.alarm.dto.create.CreateAlarmRequestDto;
+import com.springboot.bizconnect.domain.alarm.dto.create.CreateAlarmResponseDto;
+import com.springboot.bizconnect.domain.alarm.dto.list.AlarmListRequestDto;
+import com.springboot.bizconnect.domain.alarm.dto.list.AlarmListResponseDto;
+import com.springboot.bizconnect.domain.alarm.dto.read.ReadAlarmResponseDto;
 import com.springboot.bizconnect.domain.auth.CustomUserDetails;
 import com.springboot.bizconnect.entity.User;
 
@@ -21,4 +24,10 @@ public interface AlarmService {
     void sendToBranchMembers(User sender, Long companyNo, Long branchNo, String title, String content);
     // 여러명(채팅방, 특정 그룹 지정 발송)
     void sendToUsers(User sender, List<Long> receiverNos, String title, String content);
+    // 리스트 조회
+    List<AlarmListResponseDto> getAlarmList(CustomUserDetails userDetails, AlarmListRequestDto requestDto);
+    // 알람 확인
+    ReadAlarmResponseDto readAlarm(CustomUserDetails userDetails, Long alarmNo);
+    // 알람 삭제
+    void deleteAlarm(CustomUserDetails userDetails, Long alarmNo);
 }
