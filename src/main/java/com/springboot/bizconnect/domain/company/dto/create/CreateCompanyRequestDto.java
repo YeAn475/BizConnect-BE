@@ -23,4 +23,6 @@ public class CreateCompanyRequestDto {
     private String address;
     @Schema(description = "회사번호")
     private String phoneNumber;
+    @Schema(description = "설명")
+    private String content;
 }

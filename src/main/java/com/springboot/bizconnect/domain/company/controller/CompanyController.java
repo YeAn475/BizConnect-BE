@@ -4,14 +4,12 @@ import com.springboot.bizconnect.domain.auth.CustomUserDetails;
 import com.springboot.bizconnect.domain.company.dto.create.CreateCompanyRequestDto;
 import com.springboot.bizconnect.domain.company.dto.create.CreateCompanyResponseDto;
 import com.springboot.bizconnect.domain.company.service.CompanyService;
-import com.springboot.bizconnect.entity.Company;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,7 +30,6 @@ public class CompanyController {
         CreateCompanyResponseDto responseDto = companyService.createCompany(userDetails, requestDto);
         return ResponseEntity.ok(responseDto);
     }
-    // 회사 요청 승인
     // 회사 정보 수정
     // 법인계좌 추가
     // 사업자 번호 추가
