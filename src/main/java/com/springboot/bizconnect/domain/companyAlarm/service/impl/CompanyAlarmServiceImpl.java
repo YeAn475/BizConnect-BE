@@ -16,6 +16,7 @@ import com.springboot.bizconnect.entity.Company;
 import com.springboot.bizconnect.entity.CompanyRequest;
 import com.springboot.bizconnect.enums.AlarmType;
 import com.springboot.bizconnect.enums.CompanyType;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,7 @@ public class CompanyAlarmServiceImpl implements CompanyAlarmService {
     private final AlarmService alarmService;
 
     @Override
+    @Transactional
     public CompanyAlarmApproveResponseDto approveAlarm(CustomUserDetails userDetails, Long alarmNo) {
         Alarm alarm = alarmRepository.findById(alarmNo)
                 .orElseThrow(() ->  new RuntimeException("존재하지 않는 알람입니다."));
