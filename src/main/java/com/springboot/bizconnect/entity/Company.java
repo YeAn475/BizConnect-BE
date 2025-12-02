@@ -28,6 +28,9 @@ public class Company extends BaseEntity{
     @Column(name = "company_no", nullable = false)
     private Long companyNo;
 
+    @Column(name = "name", nullable = true, length = 100)
+    private String name;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "affiliation_no", nullable = false)
     private Affiliation affiliation;
