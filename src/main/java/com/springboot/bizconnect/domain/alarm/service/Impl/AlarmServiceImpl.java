@@ -13,6 +13,7 @@ import com.springboot.bizconnect.domain.user.repository.UserRepository;
 import com.springboot.bizconnect.entity.Alarm;
 import com.springboot.bizconnect.entity.User;
 import com.springboot.bizconnect.entity.UserAlarm;
+import com.springboot.bizconnect.enums.AlarmType;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
@@ -66,32 +67,38 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     @Transactional
-    public void sendToUser(User sender, Long receiverNo, String title, String content) {
+    public void sendToUser(User sender, Long receiverNo, String title, String content,
+                           AlarmType alarmType, Long referenceNo) {
         if(sender.getUserNo().equals(receiverNo)) return;
 
         Alarm alarm = alarmRepository.save(Alarm.builder()
-                        .senderUserNo(sender)
-                        .title(title)
-                        .content(content)
+                .senderUserNo(sender)
+                .title(title)
+                .content(content)
+                .alarmType(alarmType)
+                .referenceNo(referenceNo)
                 .build());
 
         User receiver = userRepository.findById(receiverNo)
                 .orElseThrow(() -> new RuntimeException("수신자를 찾을 수 없습니다."));
 
         userAlarmRepository.save(UserAlarm.builder()
-                        .user(receiver)
-                        .alarm(alarm)
-                        .isRead(false)
-                        .isDeleted(false)
+                .no(new UserAlarm.userAlarmNo(receiver.getUserNo(), alarm.getAlarmNo()))
+                .user(receiver)
+                .alarm(alarm)
+                .isRead(false)
+                .isDeleted(false)
                 .build());
     }
 
     @Override
     @Transactional
-    public void sendToOperationAdmins(User sender, String title, String content){
+    public void sendToOperationAdmins(User sender, String title, String content, AlarmType alarmType, Long referenceNo){
         Alarm alarm = alarmRepository.save(Alarm.builder()
                 .senderUserNo(sender)
                 .title(title)
+                .alarmType(alarmType)
+                .referenceNo(referenceNo)
                 .content(content)
                 .build());
 
@@ -103,7 +110,7 @@ public class AlarmServiceImpl implements AlarmService {
             if(admin.getUserNo().equals(sender.getUserNo())) continue;
 
             userAlarmRepository.save(UserAlarm.builder()
-                    .no(new UserAlarm.userAlarmNo(admin.getUserNo(), alarm.getAlarmNo()))
+                    .no(new UserAlarm.userAlarmNo(admin.getUserNo(), alarm.getAlarmNo())) // 복합키 때문에 존재 필수
                     .user(admin)
                     .alarm(alarm)
                     .isRead(false)

@@ -9,4 +9,6 @@ public interface CompanyService {
     CreateCompanyResponseDto createCompany(
             CustomUserDetails userDetails,
             CreateCompanyRequestDto createCompanyRequestDto);
+
+
 }

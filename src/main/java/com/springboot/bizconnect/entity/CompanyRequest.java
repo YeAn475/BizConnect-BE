@@ -1,5 +1,6 @@
 package com.springboot.bizconnect.entity;
 
+import com.springboot.bizconnect.enums.CompanyType;
 import com.springboot.bizconnect.enums.requestStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -47,7 +48,7 @@ public class CompanyRequest extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status",nullable = false)
-    private requestStatus status;
+    private CompanyType status;
 
     @OneToOne
     @JoinColumn(name = "user_no", nullable = false)
