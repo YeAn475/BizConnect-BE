@@ -1,4 +1,4 @@
-package com.springboot.bizconnect.domain.user.repository;
+package com.springboot.bizconnect.domain.company.repository;
 
 import com.springboot.bizconnect.entity.Company;
 import org.springframework.data.jpa.repository.JpaRepository;

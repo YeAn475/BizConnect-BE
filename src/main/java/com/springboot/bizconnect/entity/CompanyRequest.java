@@ -30,6 +30,15 @@ public class CompanyRequest extends BaseEntity {
     @Column(name = "company_request_no", nullable = false)
     private Long companyRequestNo;
 
+    @Column(name = "name", nullable = false, length = 100)
+    private String name;
+
+    @Column(name = "affiliation_name", nullable = false, length = 100)
+    private String affiliationName;
+
+    @Column(name = "branch_name", nullable = false, length = 100)
+    private String branchName;
+
     @Column(name = "address", nullable = false, length = 100)
     private String address;
 
@@ -44,11 +53,4 @@ public class CompanyRequest extends BaseEntity {
     @JoinColumn(name = "user_no", nullable = false)
     private User user;
 
-    @OneToOne
-    @JoinColumn(name = "affiliation_no", nullable = false)
-    private Affiliation affiliation;
-
-    @OneToOne
-    @JoinColumn(name = "branch_no", nullable = false)
-    private Branch branch;
 }

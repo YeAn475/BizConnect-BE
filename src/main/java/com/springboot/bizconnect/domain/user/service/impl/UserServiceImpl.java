@@ -8,7 +8,7 @@ import com.springboot.bizconnect.domain.user.dto.profile.ProfileRequestDto;
 import com.springboot.bizconnect.domain.user.dto.profile.ProfileResponseDto;
 import com.springboot.bizconnect.domain.user.dto.sign.SignupRequestDto;
 import com.springboot.bizconnect.domain.user.dto.sign.SignupResponseDto;
-import com.springboot.bizconnect.domain.user.repository.CompanyRepository;
+import com.springboot.bizconnect.domain.company.repository.CompanyRepository;
 import com.springboot.bizconnect.domain.user.repository.PositionRepository;
 import com.springboot.bizconnect.domain.user.repository.RoleRepository;
 import com.springboot.bizconnect.domain.user.repository.UserRepository;
@@ -21,11 +21,8 @@ import com.springboot.bizconnect.entity.User;
 import com.springboot.bizconnect.entity.UserStatus;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor

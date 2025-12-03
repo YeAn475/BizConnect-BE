@@ -95,7 +95,6 @@ public class AlarmServiceImpl implements AlarmService {
                 .content(content)
                 .build());
 
-        // 운영관리자, 개발관리자 찾기
         List<User> admins = userRepository.findByRole_NameIn(
                 Arrays.asList("운영관리자", "개발관리자")
         );
@@ -104,6 +103,7 @@ public class AlarmServiceImpl implements AlarmService {
             if(admin.getUserNo().equals(sender.getUserNo())) continue;
 
             userAlarmRepository.save(UserAlarm.builder()
+                    .no(new UserAlarm.userAlarmNo(admin.getUserNo(), alarm.getAlarmNo()))
                     .user(admin)
                     .alarm(alarm)
                     .isRead(false)
