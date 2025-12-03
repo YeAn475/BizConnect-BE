@@ -4,6 +4,7 @@ import com.springboot.bizconnect.domain.auth.CustomUserDetails;
 import com.springboot.bizconnect.domain.company.dto.create.CreateCompanyRequestDto;
 import com.springboot.bizconnect.domain.company.dto.create.CreateCompanyResponseDto;
 import com.springboot.bizconnect.domain.companyAlarm.dto.approve.CompanyAlarmApproveResponseDto;
+import com.springboot.bizconnect.domain.companyAlarm.dto.reject.CompanyAlarmRejectResponseDto;
 import com.springboot.bizconnect.domain.companyAlarm.service.CompanyAlarmService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,9 +41,10 @@ public class CompanyAlarmController {
     @Operation(summary = "알람 거절", description = "관리자가 알람을 거절합니다.")
     public ResponseEntity<Void> rejectAlarm(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @ParameterObject Long alarmNo
+            @ParameterObject Long alarmNo,
+            @ParameterObject String message
     ) {
-
+        CompanyAlarmRejectResponseDto responseDto = companyAlarmService.rejectAlarm(userDetails, alarmNo, message);
         return null;
     }
 
