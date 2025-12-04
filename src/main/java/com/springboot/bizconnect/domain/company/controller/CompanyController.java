@@ -3,6 +3,8 @@ package com.springboot.bizconnect.domain.company.controller;
 import com.springboot.bizconnect.domain.auth.CustomUserDetails;
 import com.springboot.bizconnect.domain.company.dto.create.CreateCompanyRequestDto;
 import com.springboot.bizconnect.domain.company.dto.create.CreateCompanyResponseDto;
+import com.springboot.bizconnect.domain.company.dto.update.UpdateCompanyRequestDto;
+import com.springboot.bizconnect.domain.company.dto.update.UpdateCompanyResponseDto;
 import com.springboot.bizconnect.domain.company.service.CompanyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -10,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,6 +34,15 @@ public class CompanyController {
         return ResponseEntity.ok(responseDto);
     }
     // 회사 정보 수정
+    @PatchMapping("/")
+    @Operation(summary = "회저 정보 수정", description = "회사 정보를 수정합니다.")
+    ResponseEntity<UpdateCompanyResponseDto> updateCompany(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @ParameterObject UpdateCompanyRequestDto requestDto
+    ) {
+        UpdateCompanyResponseDto responseDto = companyService.updateCompany(userDetails, requestDto);
+        return ResponseEntity.ok(responseDto);
+    }
     // 법인계좌 추가
     // 사업자 번호 추가
     // 회사 삭제 요청

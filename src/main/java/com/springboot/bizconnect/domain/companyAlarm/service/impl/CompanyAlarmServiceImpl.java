@@ -10,12 +10,14 @@ import com.springboot.bizconnect.domain.companyAlarm.repository.AffiliationRepos
 import com.springboot.bizconnect.domain.companyAlarm.repository.BranchRepository;
 import com.springboot.bizconnect.domain.companyAlarm.repository.CompanyRequestRepository;
 import com.springboot.bizconnect.domain.companyAlarm.service.CompanyAlarmService;
+import com.springboot.bizconnect.domain.user.repository.RoleRepository;
 import com.springboot.bizconnect.domain.user.repository.UserRepository;
 import com.springboot.bizconnect.entity.Affiliation;
 import com.springboot.bizconnect.entity.Alarm;
 import com.springboot.bizconnect.entity.Branch;
 import com.springboot.bizconnect.entity.Company;
 import com.springboot.bizconnect.entity.CompanyRequest;
+import com.springboot.bizconnect.entity.Role;
 import com.springboot.bizconnect.entity.User;
 import com.springboot.bizconnect.enums.AlarmType;
 import com.springboot.bizconnect.enums.CompanyType;
@@ -33,6 +35,7 @@ public class CompanyAlarmServiceImpl implements CompanyAlarmService {
     private final BranchRepository branchRepository;
     private final AlarmService alarmService;
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
 
     @Override
     @Transactional
@@ -81,9 +84,14 @@ public class CompanyAlarmServiceImpl implements CompanyAlarmService {
                 AlarmType.GENERAL,
                 null
         );
+
+        Role companyAdminRole = roleRepository.findById(2L)
+                .orElseThrow(() -> new RuntimeException("역할을 찾을 수 없습니다."));
+
         // 승인 이후 해당 유저의 회사 변경해야함
         User requester = companyRequest.getUser();
         requester.setCompany(company);
+        requester.setRole(companyAdminRole);
         userRepository.save(requester);
 
         // return 값으로 해당 회사 등록된거 확인 message랑 저장된 정보 전부 출력하자 서비스에서는 회사 등록 + 알람 전송 + return값 설정(이걸 하는 유저의 role 확인하기)

@@ -4,11 +4,19 @@ import com.springboot.bizconnect.domain.alarm.service.Impl.AlarmServiceImpl;
 import com.springboot.bizconnect.domain.auth.CustomUserDetails;
 import com.springboot.bizconnect.domain.company.dto.create.CreateCompanyRequestDto;
 import com.springboot.bizconnect.domain.company.dto.create.CreateCompanyResponseDto;
+import com.springboot.bizconnect.domain.company.dto.update.UpdateCompanyRequestDto;
+import com.springboot.bizconnect.domain.company.dto.update.UpdateCompanyResponseDto;
 import com.springboot.bizconnect.domain.company.repository.CompanyRepository;
+import com.springboot.bizconnect.domain.companyAlarm.repository.AffiliationRepository;
+import com.springboot.bizconnect.domain.companyAlarm.repository.BranchRepository;
 import com.springboot.bizconnect.domain.companyAlarm.repository.CompanyRequestRepository;
 import com.springboot.bizconnect.domain.company.service.CompanyService;
 import com.springboot.bizconnect.domain.user.repository.UserRepository;
+import com.springboot.bizconnect.entity.Affiliation;
+import com.springboot.bizconnect.entity.Branch;
+import com.springboot.bizconnect.entity.Company;
 import com.springboot.bizconnect.entity.CompanyRequest;
+import com.springboot.bizconnect.entity.User;
 import com.springboot.bizconnect.enums.AlarmType;
 import com.springboot.bizconnect.enums.CompanyType;
 import com.springboot.bizconnect.enums.requestStatus;
@@ -25,6 +33,8 @@ public class CompanyServiceImpl implements CompanyService {
     private final CompanyRequestRepository companyRequestRepository;
     private final AlarmServiceImpl alarmService;
     private final UserRepository userRepository;
+    private final AffiliationRepository affiliationRepository;
+    private final BranchRepository branchRepository;
 
     @Override
     public CreateCompanyResponseDto createCompany(CustomUserDetails userDetails, CreateCompanyRequestDto createCompanyRequestDto) {
@@ -67,6 +77,58 @@ public class CompanyServiceImpl implements CompanyService {
 
         return CreateCompanyResponseDto.builder()
                 .message("회사 등록 요청이 완료되었습니다.")
+                .build();
+    }
+
+    @Override
+    public UpdateCompanyResponseDto updateCompany(CustomUserDetails userDetails, UpdateCompanyRequestDto requestDto) {
+        User user = userRepository.findById(userDetails.getUser().getUserNo())
+                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
+
+        if (user.getRole() == null || !user.getRole().getRoleNo().equals(2L)) throw new RuntimeException("회사 정보 수정 권한이 없습니다.");
+
+
+        Company company = user.getCompany();
+        if (company == null) throw new RuntimeException("소속된 회사가 없습니다.");
+
+        if (requestDto.getCompanyName() != null) company.setName(requestDto.getCompanyName());
+
+        if (requestDto.getCompanyAddress() != null) company.setAddress(requestDto.getCompanyAddress());
+
+        if (requestDto.getCompanyPhone() != null) company.setPhoneNumber(requestDto.getCompanyPhone());
+
+        if (requestDto.getAffiliationName() != null) {
+            Affiliation affiliation = affiliationRepository.findByName(requestDto.getAffiliationName())
+                    .orElseGet(() -> affiliationRepository.save(
+                            Affiliation.builder()
+                                    .name(requestDto.getAffiliationName())
+                                    .build()
+                    ));
+            company.setAffiliation(affiliation);
+        }
+
+        if (requestDto.getBranchName() != null) {
+            Branch branch = branchRepository.findByName(requestDto.getBranchName())
+                    .orElseGet(() -> branchRepository.save(
+                            Branch.builder()
+                                    .name(requestDto.getBranchName())
+                                    .build()
+                    ));
+            company.setBranch(branch);
+        }
+
+        companyRepository.save(company);
+
+        return UpdateCompanyResponseDto.builder()
+                .message("회사 정보가 수정되었습니다.")
+                .companyName(company.getName())
+                .companyName(company.getName())
+                .branchName(company.getBranch().getName())
+                .affiliationName(company.getAffiliation().getName())
+                .address(company.getAddress())
+                .phoneNumber(company.getPhoneNumber())
+                .createdAt(company.getCreatedAt())
+                .updatedAt(company.getUpdatedAt())
                 .build();
     }
 }
