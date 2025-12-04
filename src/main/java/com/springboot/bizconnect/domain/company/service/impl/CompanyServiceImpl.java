@@ -4,6 +4,8 @@ import com.springboot.bizconnect.domain.alarm.service.Impl.AlarmServiceImpl;
 import com.springboot.bizconnect.domain.auth.CustomUserDetails;
 import com.springboot.bizconnect.domain.company.dto.create.CreateCompanyRequestDto;
 import com.springboot.bizconnect.domain.company.dto.create.CreateCompanyResponseDto;
+import com.springboot.bizconnect.domain.company.dto.list.CompanyListRequestDto;
+import com.springboot.bizconnect.domain.company.dto.list.CompanyListResponseDto;
 import com.springboot.bizconnect.domain.company.dto.update.UpdateCompanyRequestDto;
 import com.springboot.bizconnect.domain.company.dto.update.UpdateCompanyResponseDto;
 import com.springboot.bizconnect.domain.company.repository.CompanyRepository;
@@ -22,7 +24,11 @@ import com.springboot.bizconnect.enums.CompanyType;
 import com.springboot.bizconnect.enums.requestStatus;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @Transactional
@@ -130,5 +136,21 @@ public class CompanyServiceImpl implements CompanyService {
                 .createdAt(company.getCreatedAt())
                 .updatedAt(company.getUpdatedAt())
                 .build();
+    }
+
+    @Override
+    public List<CompanyListResponseDto> companyList(CustomUserDetails userDetails, CompanyListRequestDto requestDto) {
+        PageRequest pageRequest = PageRequest.of(requestDto.getPage(), requestDto.getSize());
+
+        return companyRepository.findAll(pageRequest)
+                .map(company -> CompanyListResponseDto.builder()
+                        .companyNo(company.getCompanyNo())
+                        .companyName(company.getName())
+                        .affiliationName(company.getAffiliation().getName())
+                        .branchName(company.getBranch().getName())
+                        .address(company.getAddress())
+                        .phoneNumber(company.getPhoneNumber())
+                        .build())
+                .getContent();
     }
 }

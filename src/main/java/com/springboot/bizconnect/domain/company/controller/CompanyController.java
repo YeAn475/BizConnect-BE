@@ -3,6 +3,8 @@ package com.springboot.bizconnect.domain.company.controller;
 import com.springboot.bizconnect.domain.auth.CustomUserDetails;
 import com.springboot.bizconnect.domain.company.dto.create.CreateCompanyRequestDto;
 import com.springboot.bizconnect.domain.company.dto.create.CreateCompanyResponseDto;
+import com.springboot.bizconnect.domain.company.dto.list.CompanyListRequestDto;
+import com.springboot.bizconnect.domain.company.dto.list.CompanyListResponseDto;
 import com.springboot.bizconnect.domain.company.dto.update.UpdateCompanyRequestDto;
 import com.springboot.bizconnect.domain.company.dto.update.UpdateCompanyResponseDto;
 import com.springboot.bizconnect.domain.company.service.CompanyService;
@@ -12,10 +14,13 @@ import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/company")
@@ -43,6 +48,17 @@ public class CompanyController {
         UpdateCompanyResponseDto responseDto = companyService.updateCompany(userDetails, requestDto);
         return ResponseEntity.ok(responseDto);
     }
+    // 회사 리스트 확인
+    @GetMapping("/list")
+    @Operation(summary = "모든 회사 리스트 조회", description = "모든 회사 리스트를 조회합니다")
+    ResponseEntity<List<CompanyListResponseDto>> listCompany(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @ParameterObject CompanyListRequestDto requestDto
+    ) {
+        List<CompanyListResponseDto> responseDto = companyService.companyList(userDetails, requestDto);
+        return ResponseEntity.ok(responseDto);
+    }
+
     // 법인계좌 추가
     // 사업자 번호 추가
     // 회사 삭제 요청
