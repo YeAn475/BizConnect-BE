@@ -2,6 +2,9 @@ package com.springboot.bizconnect.domain.user.service.impl;
 
 import com.springboot.bizconnect.domain.auth.CustomUserDetails;
 import com.springboot.bizconnect.domain.auth.RefreshTokenService;
+import com.springboot.bizconnect.domain.image.CloudinaryService;
+import com.springboot.bizconnect.domain.user.dto.profile.UserProfileResponseDto;
+import com.springboot.bizconnect.domain.user.dto.image.ProfileImageResponseDto;
 import com.springboot.bizconnect.domain.user.dto.password.PasswordRequestDto;
 import com.springboot.bizconnect.domain.user.dto.password.PasswordResponseDto;
 import com.springboot.bizconnect.domain.user.dto.profile.ProfileRequestDto;
@@ -23,6 +26,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +38,7 @@ public class UserServiceImpl implements UserService {
     private final CompanyRepository companyRepository;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenService refreshTokenService;
+    private final CloudinaryService cloudinaryService;
 
     @Override
     @Transactional
@@ -135,5 +140,49 @@ public class UserServiceImpl implements UserService {
         refreshTokenService.deleteRefreshToken(email);
 
         return "성공적으로 탈퇴하였습니다.";
+    }
+
+    @Override
+    public ProfileImageResponseDto uploadProfileImage(CustomUserDetails userDetails, MultipartFile image) {
+        User user = userRepository.findById(userDetails.getUser().getUserNo())
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        // 기존 이미지가 있으면 삭제
+        if (user.getImageUrl() != null && !user.getImageUrl().isEmpty()) {
+            cloudinaryService.delete(user.getImageUrl());
+        }
+
+        // 새 이미지 업로드
+        String imageUrl = cloudinaryService.upload(image, "profile");
+
+        // DB에 URL 저장
+        user.setImageUrl(imageUrl);
+        userRepository.save(user);
+
+        return ProfileImageResponseDto.builder()
+                .message("프로필 이미지가 업로드되었습니다.")
+                .imageUrl(imageUrl)
+                .build();
+    }
+
+    @Override
+    public UserProfileResponseDto getProfile(CustomUserDetails userDetails) {
+        User user = userRepository.findById(userDetails.getUser().getUserNo())
+                .orElseThrow(() -> new RuntimeException("유저 정보가 존재하지 않습니다."));
+
+        return UserProfileResponseDto.builder()
+                .name(user.getName())
+                .email(user.getEmail())
+                .companyName(user.getCompany().getName())
+                .roleName(user.getRole().getName())
+                .positionName(user.getPosition().getName())
+                .userStatus(user.getUserStatus().getName())
+                .phoneNumber(user.getPhoneNumber())
+                .address(user.getAddress())
+                .imageUrl(user.getImageUrl())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .isOpened(user.getIsOpen())
+                .build();
     }
 }
