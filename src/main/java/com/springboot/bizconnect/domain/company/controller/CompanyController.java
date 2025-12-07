@@ -1,6 +1,8 @@
 package com.springboot.bizconnect.domain.company.controller;
 
 import com.springboot.bizconnect.domain.auth.CustomUserDetails;
+import com.springboot.bizconnect.domain.company.dto.account.AccountReqeustDto;
+import com.springboot.bizconnect.domain.company.dto.account.AccountResponseDto;
 import com.springboot.bizconnect.domain.company.dto.create.CreateCompanyRequestDto;
 import com.springboot.bizconnect.domain.company.dto.create.CreateCompanyResponseDto;
 import com.springboot.bizconnect.domain.company.dto.list.CompanyListRequestDto;
@@ -60,6 +62,18 @@ public class CompanyController {
     }
 
     // 법인계좌 추가
+    @PostMapping("/account")
+    @Operation(summary = "법인계좌 추가", description = "회사관리자가 법인계좌를 추가합니다.")
+    ResponseEntity<AccountResponseDto> createCompanyAccount(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @ParameterObject AccountReqeustDto requestDto
+    ) {
+        AccountResponseDto responseDto = companyService.createCompanyAccount(userDetails, requestDto);
+        return ResponseEntity.ok(responseDto);
+    }
+
+
+
     // 사업자 번호 추가
     // 회사 삭제 요청
 }

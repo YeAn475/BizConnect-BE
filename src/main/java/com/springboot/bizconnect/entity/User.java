@@ -74,6 +74,7 @@ public class User extends BaseEntity {
     @Column(name = "is_open", nullable = false)
     private Boolean isOpen = true;
 
+
 //    @OneToMany(mappedBy = "user")
 //    private List<Alarm> notices = new ArrayList<>();
 

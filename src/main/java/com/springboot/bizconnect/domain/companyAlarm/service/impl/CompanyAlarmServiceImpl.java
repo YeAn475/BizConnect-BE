@@ -25,6 +25,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+
 @Service
 @RequiredArgsConstructor
 public class CompanyAlarmServiceImpl implements CompanyAlarmService {
@@ -42,6 +44,9 @@ public class CompanyAlarmServiceImpl implements CompanyAlarmService {
     public CompanyAlarmApproveResponseDto approveAlarm(CustomUserDetails userDetails, Long alarmNo) {
         Alarm alarm = alarmRepository.findById(alarmNo)
                 .orElseThrow(() ->  new RuntimeException("존재하지 않는 알람입니다."));
+        User user = userDetails.getUser();
+        Long userRoleNo = user.getRole().getRoleNo();
+        if (!Arrays.asList(2L, 3L, 4L).contains(userRoleNo)) throw new RuntimeException("권한이 없습니다.");
         // 해당 알람 번호의 알람 타입이 회사인지 확인
         if (alarm.getAlarmType() != AlarmType.COMPANY_REGISTER_REQUEST) throw new RuntimeException("회사 등록 요청 알람이 아닙니다.");
         // 해당 reference_no를 가지고 branch하고 affiliation 먼저 값을 저장하고 company 등록
@@ -105,6 +110,7 @@ public class CompanyAlarmServiceImpl implements CompanyAlarmService {
                 .updatedAt(companyRequest.getUpdatedAt())
                 .message("회사 등록을 승인하셨습니다.")
                 .build();
+
     }
 
     @Override

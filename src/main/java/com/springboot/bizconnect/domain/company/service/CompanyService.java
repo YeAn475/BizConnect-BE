@@ -1,6 +1,8 @@
 package com.springboot.bizconnect.domain.company.service;
 
 import com.springboot.bizconnect.domain.auth.CustomUserDetails;
+import com.springboot.bizconnect.domain.company.dto.account.AccountReqeustDto;
+import com.springboot.bizconnect.domain.company.dto.account.AccountResponseDto;
 import com.springboot.bizconnect.domain.company.dto.create.CreateCompanyRequestDto;
 import com.springboot.bizconnect.domain.company.dto.create.CreateCompanyResponseDto;
 import com.springboot.bizconnect.domain.company.dto.list.CompanyListRequestDto;
@@ -20,8 +22,15 @@ public interface CompanyService {
 
     UpdateCompanyResponseDto updateCompany(
             CustomUserDetails userDetails,
-            UpdateCompanyRequestDto requestDto
+            UpdateCompanyRequestDto requestDto);
+
+    List<CompanyListResponseDto> companyList(
+            CustomUserDetails userDetails,
+            CompanyListRequestDto requestDto);
+
+    AccountResponseDto createCompanyAccount(
+            CustomUserDetails userDetails,
+            AccountReqeustDto requestDto
     );
-    List<CompanyListResponseDto> companyList(CustomUserDetails userDetails, CompanyListRequestDto requestDto);
 
 }
