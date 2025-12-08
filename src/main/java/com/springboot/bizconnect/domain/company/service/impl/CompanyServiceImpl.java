@@ -10,6 +10,7 @@ import com.springboot.bizconnect.domain.company.dto.list.CompanyListRequestDto;
 import com.springboot.bizconnect.domain.company.dto.list.CompanyListResponseDto;
 import com.springboot.bizconnect.domain.company.dto.update.UpdateCompanyRequestDto;
 import com.springboot.bizconnect.domain.company.dto.update.UpdateCompanyResponseDto;
+import com.springboot.bizconnect.domain.company.repository.AccountRepository;
 import com.springboot.bizconnect.domain.company.repository.CompanyRepository;
 import com.springboot.bizconnect.domain.company.repository.CorporateAccountRepository;
 import com.springboot.bizconnect.domain.companyAlarm.repository.AffiliationRepository;
@@ -51,6 +52,7 @@ public class CompanyServiceImpl implements CompanyService {
     private final BranchRepository branchRepository;
     private final RoleRepository roleRepository;
     private final CorporateAccountRepository corporateAccountRepository;
+    private final AccountRepository accountRepository;
 
     @Override
     public CreateCompanyResponseDto createCompany(CustomUserDetails userDetails, CreateCompanyRequestDto createCompanyRequestDto) {
@@ -181,6 +183,15 @@ public class CompanyServiceImpl implements CompanyService {
                 .build();
 
         corporateAccountRepository.save(corporateAccount);
+
+        // acount 복합키 테이블에도 저장
+        Account account = Account.builder()
+                .no(new Account.AccountNo(company.getCompanyNo(), corporateAccount.getCorporateAccountNo()))
+                .company(company)
+                .corporateAccount(corporateAccount)
+                .build();
+
+        accountRepository.save(account);
 
         return AccountResponseDto.builder()
                 .Companyname(user.getCompany().getName())
