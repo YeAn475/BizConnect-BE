@@ -7,6 +7,8 @@ import com.springboot.bizconnect.domain.company.dto.create.CreateCompanyRequestD
 import com.springboot.bizconnect.domain.company.dto.create.CreateCompanyResponseDto;
 import com.springboot.bizconnect.domain.company.dto.list.CompanyListRequestDto;
 import com.springboot.bizconnect.domain.company.dto.list.CompanyListResponseDto;
+import com.springboot.bizconnect.domain.company.dto.registration.RegistrationRequestDto;
+import com.springboot.bizconnect.domain.company.dto.registration.RegistrationResponseDto;
 import com.springboot.bizconnect.domain.company.dto.update.UpdateCompanyRequestDto;
 import com.springboot.bizconnect.domain.company.dto.update.UpdateCompanyResponseDto;
 import org.springdoc.core.annotations.ParameterObject;
@@ -31,6 +33,10 @@ public interface CompanyService {
     AccountResponseDto createCompanyAccount(
             CustomUserDetails userDetails,
             AccountReqeustDto requestDto
+    );
+    RegistrationResponseDto createCompanyRegistration(
+            CustomUserDetails userDetails,
+            RegistrationRequestDto requestDto
     );
 
 }

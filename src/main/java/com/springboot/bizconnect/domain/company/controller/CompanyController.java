@@ -7,6 +7,8 @@ import com.springboot.bizconnect.domain.company.dto.create.CreateCompanyRequestD
 import com.springboot.bizconnect.domain.company.dto.create.CreateCompanyResponseDto;
 import com.springboot.bizconnect.domain.company.dto.list.CompanyListRequestDto;
 import com.springboot.bizconnect.domain.company.dto.list.CompanyListResponseDto;
+import com.springboot.bizconnect.domain.company.dto.registration.RegistrationRequestDto;
+import com.springboot.bizconnect.domain.company.dto.registration.RegistrationResponseDto;
 import com.springboot.bizconnect.domain.company.dto.update.UpdateCompanyRequestDto;
 import com.springboot.bizconnect.domain.company.dto.update.UpdateCompanyResponseDto;
 import com.springboot.bizconnect.domain.company.service.CompanyService;
@@ -71,9 +73,16 @@ public class CompanyController {
         AccountResponseDto responseDto = companyService.createCompanyAccount(userDetails, requestDto);
         return ResponseEntity.ok(responseDto);
     }
-
-
-
     // 사업자 번호 추가
+    @PostMapping("/registration")
+    @Operation(summary = "사업자번호 추가", description = "회사관리자가 사업자번호를 추가합니다.")
+    ResponseEntity<RegistrationResponseDto> createCompanyRegistration(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @ParameterObject RegistrationRequestDto requestDto
+    ) {
+        RegistrationResponseDto responseDto = companyService.createCompanyRegistration(userDetails, requestDto);
+        return ResponseEntity.ok(responseDto);
+    }
+
     // 회사 삭제 요청
 }
