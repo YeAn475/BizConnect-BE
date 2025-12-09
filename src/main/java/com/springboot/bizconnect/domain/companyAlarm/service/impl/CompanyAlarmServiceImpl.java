@@ -10,18 +10,22 @@ import com.springboot.bizconnect.domain.companyAlarm.repository.AffiliationRepos
 import com.springboot.bizconnect.domain.companyAlarm.repository.BranchRepository;
 import com.springboot.bizconnect.domain.companyAlarm.repository.CompanyRequestRepository;
 import com.springboot.bizconnect.domain.companyAlarm.service.CompanyAlarmService;
+import com.springboot.bizconnect.domain.user.repository.RoleRepository;
 import com.springboot.bizconnect.domain.user.repository.UserRepository;
 import com.springboot.bizconnect.entity.Affiliation;
 import com.springboot.bizconnect.entity.Alarm;
 import com.springboot.bizconnect.entity.Branch;
 import com.springboot.bizconnect.entity.Company;
 import com.springboot.bizconnect.entity.CompanyRequest;
+import com.springboot.bizconnect.entity.Role;
 import com.springboot.bizconnect.entity.User;
 import com.springboot.bizconnect.enums.AlarmType;
 import com.springboot.bizconnect.enums.CompanyType;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
 
 @Service
 @RequiredArgsConstructor
@@ -33,12 +37,16 @@ public class CompanyAlarmServiceImpl implements CompanyAlarmService {
     private final BranchRepository branchRepository;
     private final AlarmService alarmService;
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
 
     @Override
     @Transactional
     public CompanyAlarmApproveResponseDto approveAlarm(CustomUserDetails userDetails, Long alarmNo) {
         Alarm alarm = alarmRepository.findById(alarmNo)
                 .orElseThrow(() ->  new RuntimeException("존재하지 않는 알람입니다."));
+        User user = userDetails.getUser();
+        Long userRoleNo = user.getRole().getRoleNo();
+        if (!Arrays.asList(2L, 3L, 4L).contains(userRoleNo)) throw new RuntimeException("권한이 없습니다.");
         // 해당 알람 번호의 알람 타입이 회사인지 확인
         if (alarm.getAlarmType() != AlarmType.COMPANY_REGISTER_REQUEST) throw new RuntimeException("회사 등록 요청 알람이 아닙니다.");
         // 해당 reference_no를 가지고 branch하고 affiliation 먼저 값을 저장하고 company 등록
@@ -81,9 +89,14 @@ public class CompanyAlarmServiceImpl implements CompanyAlarmService {
                 AlarmType.GENERAL,
                 null
         );
+
+        Role companyAdminRole = roleRepository.findById(2L)
+                .orElseThrow(() -> new RuntimeException("역할을 찾을 수 없습니다."));
+
         // 승인 이후 해당 유저의 회사 변경해야함
         User requester = companyRequest.getUser();
         requester.setCompany(company);
+        requester.setRole(companyAdminRole);
         userRepository.save(requester);
 
         // return 값으로 해당 회사 등록된거 확인 message랑 저장된 정보 전부 출력하자 서비스에서는 회사 등록 + 알람 전송 + return값 설정(이걸 하는 유저의 role 확인하기)
@@ -97,6 +110,7 @@ public class CompanyAlarmServiceImpl implements CompanyAlarmService {
                 .updatedAt(companyRequest.getUpdatedAt())
                 .message("회사 등록을 승인하셨습니다.")
                 .build();
+
     }
 
     @Override
