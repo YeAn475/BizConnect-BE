@@ -33,4 +33,10 @@ public class CustomUserDetails implements UserDetails {
     public String getUsername() {
         return user.getEmail();
     }
+    
+    // 회사 조회
+    public Long getCompanyNo() {
+    	return user.getCompany().getCompanyNo();
+    }
+    
 }

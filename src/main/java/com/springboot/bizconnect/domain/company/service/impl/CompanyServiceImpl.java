@@ -31,14 +31,11 @@ import com.springboot.bizconnect.entity.Company;
 import com.springboot.bizconnect.entity.CompanyRequest;
 import com.springboot.bizconnect.entity.CorporateAccount;
 import com.springboot.bizconnect.entity.Registration;
-import com.springboot.bizconnect.entity.Role;
 import com.springboot.bizconnect.entity.User;
 import com.springboot.bizconnect.enums.AlarmType;
 import com.springboot.bizconnect.enums.CompanyType;
-import com.springboot.bizconnect.enums.requestStatus;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
