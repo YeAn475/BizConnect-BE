@@ -1,10 +1,12 @@
 package com.springboot.bizconnect.domain.product.service.impl;
 
 import com.springboot.bizconnect.domain.auth.CustomUserDetails;
+import com.springboot.bizconnect.domain.image.CloudinaryService;
 import com.springboot.bizconnect.domain.product.dto.create.CreateProductRequestDto;
 import com.springboot.bizconnect.domain.product.dto.create.CreateProductResponseDto;
 import com.springboot.bizconnect.domain.product.dto.detail.ProductDetailRequestDto;
 import com.springboot.bizconnect.domain.product.dto.detail.ProductDetailResponseDto;
+import com.springboot.bizconnect.domain.product.dto.image.ProductImageResponseDto;
 import com.springboot.bizconnect.domain.product.dto.list.ProductListRequestDto;
 import com.springboot.bizconnect.domain.product.dto.list.ProductListResponseDto;
 import com.springboot.bizconnect.domain.product.repository.CategoryRepository;
@@ -25,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 import org.springdoc.core.service.GenericResponseService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 import java.util.List;
@@ -39,7 +42,8 @@ public class ProductServiceImpl implements ProductService {
     private final ManufacturerRepository manufacturerRepository;
     private final ProductStatusRepository productStatusRepository;
     private final ProductRepository productRepository;
-    private final GenericResponseService responseBuilder;
+    private final CloudinaryService cloudinaryService;
+//    private final GenericResponseService responseBuilder;
 
     @Override
     public CreateProductResponseDto createProduct(CustomUserDetails userDetails, CreateProductRequestDto requestDto) {
@@ -113,5 +117,29 @@ public class ProductServiceImpl implements ProductService {
 				.updatedAt(product.getUpdatedAt())
 				.build();
 				
+	}
+
+	@Override
+	@Transactional
+	public ProductImageResponseDto uploadProductImage(Long productNo, MultipartFile image) {
+		// 1. 상품 존재 확인
+	    Product product = productRepository.findById(productNo)
+	            .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
+
+	    // 2. 기존 이미지가 있으면 Cloudinary에서 삭제
+	    if (product.getImageUrl() != null && !product.getImageUrl().isEmpty()) {
+	        cloudinaryService.delete(product.getImageUrl());
+	    }
+
+	    // 3. 새 이미지 업로드 (폴더명을 "product"로 지정)
+	    String imageUrl = cloudinaryService.upload(image, "product");
+
+	    // 4. DB에 URL 저장 (Dirty Checking으로 자동 업데이트)
+	    product.setImageUrl(imageUrl);
+
+	    return ProductImageResponseDto.builder()
+	            .message("상품 이미지가 성공적으로 등록되었습니다.")
+	            .url(imageUrl)
+	            .build();
 	}
 }

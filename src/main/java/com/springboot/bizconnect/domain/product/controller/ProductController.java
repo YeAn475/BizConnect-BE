@@ -5,6 +5,7 @@ import com.springboot.bizconnect.domain.product.dto.create.CreateProductRequestD
 import com.springboot.bizconnect.domain.product.dto.create.CreateProductResponseDto;
 import com.springboot.bizconnect.domain.product.dto.detail.ProductDetailRequestDto;
 import com.springboot.bizconnect.domain.product.dto.detail.ProductDetailResponseDto;
+import com.springboot.bizconnect.domain.product.dto.image.ProductImageResponseDto;
 import com.springboot.bizconnect.domain.product.dto.list.ProductListRequestDto;
 import com.springboot.bizconnect.domain.product.dto.list.ProductListResponseDto;
 import com.springboot.bizconnect.domain.product.service.ProductService;
@@ -16,14 +17,19 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
+import org.springframework.http.MediaType;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/product")
@@ -60,16 +66,25 @@ public class ProductController {
     	return ResponseEntity.ok(responseDto);
     }
     
-    @PatchMapping("/")
-    @Operation(summary = "상품 정보 수정", description = "상품 정보를 수정합니다.")
-    public ResponseEntity<?> UpdateProduct() {
-    	return null;
-    }
-
-    @PutMapping("/")
-    @Operation(summary = "상품 등록 해제", description = "운영 관리자가 상품을 삭제합니다.")
-    public ResponseEntity<?> deleteProduct() {
-        return null;
+//    @PatchMapping("/")
+//    @Operation(summary = "상품 정보 수정", description = "상품 정보를 수정합니다.")
+//    public ResponseEntity<?> UpdateProduct() {
+//    	return null;
+//    }
+//
+//    @PutMapping("/")
+//    @Operation(summary = "상품 등록 해제", description = "운영 관리자가 상품을 삭제합니다.")
+//    public ResponseEntity<?> deleteProduct() {
+//        return null;
+//    }
+    
+    @PostMapping(value = "/{productNo}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "상품 이미지 업로드", description = "특정 상품의 이미지를 업로드하거나 변경합니다.")
+    public ResponseEntity<ProductImageResponseDto> uploadProductImage(
+    		@PathVariable("productNo") Long productNo,
+            @RequestPart("image") MultipartFile image) {
+        ProductImageResponseDto responseDto = productService.uploadProductImage(productNo, image);
+        return ResponseEntity.ok(responseDto);
     }
 
 }
