@@ -3,6 +3,8 @@ package com.springboot.bizconnect.domain.product.service.impl;
 import com.springboot.bizconnect.domain.auth.CustomUserDetails;
 import com.springboot.bizconnect.domain.product.dto.create.CreateProductRequestDto;
 import com.springboot.bizconnect.domain.product.dto.create.CreateProductResponseDto;
+import com.springboot.bizconnect.domain.product.dto.list.ProductListRequestDto;
+import com.springboot.bizconnect.domain.product.dto.list.ProductListResponseDto;
 import com.springboot.bizconnect.domain.product.repository.CategoryRepository;
 import com.springboot.bizconnect.domain.product.repository.ManufacturerRepository;
 import com.springboot.bizconnect.domain.product.repository.ProductRepository;
@@ -19,9 +21,11 @@ import com.springboot.bizconnect.entity.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.service.GenericResponseService;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Service
 @Transactional
@@ -75,4 +79,16 @@ public class ProductServiceImpl implements ProductService {
 
         return new CreateProductResponseDto(requestDto.getName() + " 상품이 등록 완료되었습니다.");
     }
+
+	@Override
+	public List<ProductListResponseDto> getProductList(ProductListRequestDto requestDto) {
+		PageRequest pageRequest = PageRequest.of(requestDto.getPage(), requestDto.getSize());
+		
+		return productRepository.findAll(pageRequest)
+				.map(product -> ProductListResponseDto.builder()
+						.productNo(product.getProductNo())
+						.name(product.getName())
+						.imageUrl(product.getImageUrl()).build())
+				.getContent();
+	}
 }
