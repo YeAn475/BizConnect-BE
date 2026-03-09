@@ -3,6 +3,8 @@ package com.springboot.bizconnect.domain.product.controller;
 import com.springboot.bizconnect.domain.auth.CustomUserDetails;
 import com.springboot.bizconnect.domain.product.dto.create.CreateProductRequestDto;
 import com.springboot.bizconnect.domain.product.dto.create.CreateProductResponseDto;
+import com.springboot.bizconnect.domain.product.dto.detail.ProductDetailRequestDto;
+import com.springboot.bizconnect.domain.product.dto.detail.ProductDetailResponseDto;
 import com.springboot.bizconnect.domain.product.dto.list.ProductListRequestDto;
 import com.springboot.bizconnect.domain.product.dto.list.ProductListResponseDto;
 import com.springboot.bizconnect.domain.product.service.ProductService;
@@ -44,15 +46,18 @@ public class ProductController {
     @Operation(summary = "상품 리스트 조회", description = "상품 리스트를 조회합니다.")
     public ResponseEntity<List<ProductListResponseDto>> getProductList(
     		 @ParameterObject ProductListRequestDto requestDto
-    		) {
+    ) {
     	List<ProductListResponseDto> responseDto = productService.getProductList(requestDto);
     	return ResponseEntity.ok(responseDto);
     }
     
     @PostMapping("/{productNo}")
     @Operation(summary = "상제 상품 조회", description = "상세 상품을 조회합니다.")
-    public ResponseEntity<?> ProductDetail() {
-    	return null;
+    public ResponseEntity<ProductDetailResponseDto> ProductDetail(
+    		@ParameterObject ProductDetailRequestDto requestDto
+    ) {
+    	ProductDetailResponseDto responseDto = productService.ProductDetail(requestDto);
+    	return ResponseEntity.ok(responseDto);
     }
     
     @PatchMapping("/")

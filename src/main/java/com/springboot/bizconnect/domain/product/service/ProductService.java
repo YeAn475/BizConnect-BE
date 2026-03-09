@@ -3,6 +3,8 @@ package com.springboot.bizconnect.domain.product.service;
 import com.springboot.bizconnect.domain.auth.CustomUserDetails;
 import com.springboot.bizconnect.domain.product.dto.create.CreateProductRequestDto;
 import com.springboot.bizconnect.domain.product.dto.create.CreateProductResponseDto;
+import com.springboot.bizconnect.domain.product.dto.detail.ProductDetailRequestDto;
+import com.springboot.bizconnect.domain.product.dto.detail.ProductDetailResponseDto;
 import com.springboot.bizconnect.domain.product.dto.list.ProductListRequestDto;
 import com.springboot.bizconnect.domain.product.dto.list.ProductListResponseDto;
 
@@ -15,4 +17,6 @@ public interface ProductService {
     CreateProductResponseDto createProduct(@AuthenticationPrincipal CustomUserDetails userDetails, @ParameterObject CreateProductRequestDto requestDto);
     
     List<ProductListResponseDto> getProductList(@ParameterObject ProductListRequestDto requestDto);
+    
+    ProductDetailResponseDto ProductDetail(@ParameterObject ProductDetailRequestDto requestDto);
 }

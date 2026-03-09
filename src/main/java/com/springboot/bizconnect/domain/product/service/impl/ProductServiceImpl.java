@@ -3,6 +3,8 @@ package com.springboot.bizconnect.domain.product.service.impl;
 import com.springboot.bizconnect.domain.auth.CustomUserDetails;
 import com.springboot.bizconnect.domain.product.dto.create.CreateProductRequestDto;
 import com.springboot.bizconnect.domain.product.dto.create.CreateProductResponseDto;
+import com.springboot.bizconnect.domain.product.dto.detail.ProductDetailRequestDto;
+import com.springboot.bizconnect.domain.product.dto.detail.ProductDetailResponseDto;
 import com.springboot.bizconnect.domain.product.dto.list.ProductListRequestDto;
 import com.springboot.bizconnect.domain.product.dto.list.ProductListResponseDto;
 import com.springboot.bizconnect.domain.product.repository.CategoryRepository;
@@ -90,5 +92,26 @@ public class ProductServiceImpl implements ProductService {
 						.name(product.getName())
 						.imageUrl(product.getImageUrl()).build())
 				.getContent();
+	}
+
+	@Override
+	public ProductDetailResponseDto ProductDetail(ProductDetailRequestDto requestDto) {
+		Product product = productRepository.findById(requestDto.getProductNo())
+				.orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
+		
+		return ProductDetailResponseDto.builder()
+				.productNo(product.getProductNo())
+				.unitName(product.getUnit().getName())
+				.categoryName(product.getCategory().getName())
+				.manufacturerName(product.getManufacturer().getName())
+				.productStatusName(product.getProductStatus().getName())
+				.name(product.getName())
+				.content(product.getContent())
+				.price(product.getPrice())
+				.imageUrl(product.getImageUrl())
+				.createdAt(product.getCreatedAt())
+				.updatedAt(product.getUpdatedAt())
+				.build();
+				
 	}
 }
