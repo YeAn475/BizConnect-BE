@@ -13,13 +13,13 @@ import lombok.Setter;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "company_product")
+@Table(name = "company_product_cart")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CompanyProduct extends BaseEntity {
+public class CompanyProductCart extends BaseEntity {
     @EmbeddedId
     private companyProductNo no;
 
