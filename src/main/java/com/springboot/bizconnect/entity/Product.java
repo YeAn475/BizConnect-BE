@@ -26,7 +26,7 @@ public class Product extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "product_no", nullable = false)
-    private Integer productNo;
+    private Long productNo;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "unit_no", nullable = false)
@@ -55,8 +55,5 @@ public class Product extends BaseEntity {
 
     @Column(name = "image_url")
     private String imageUrl;
-
-    @Column(name = "is_deleted", nullable = false)
-    private Boolean isDeleted = Boolean.FALSE;
 
 }

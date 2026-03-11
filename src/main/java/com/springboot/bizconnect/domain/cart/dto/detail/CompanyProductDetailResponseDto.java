@@ -15,7 +15,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CompanyProductDetailResponseDto {
-	private int productNo;
+	private Long productNo;
 	private String unitName;
 	private String categoryName;
 	private String manufacturerName;

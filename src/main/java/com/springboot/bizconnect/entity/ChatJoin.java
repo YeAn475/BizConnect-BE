@@ -44,10 +44,10 @@ public class ChatJoin {
     @Embeddable
     public static class chatJoinNo implements Serializable {
         @Column(name = "user_no", nullable = false)
-        private Integer userNo;
+        private Long userNo;
 
         @Column(name = "chatroom_no", nullable = false)
-        private Integer chatroomNo;
+        private Long chatroomNo;
     }
 
 }

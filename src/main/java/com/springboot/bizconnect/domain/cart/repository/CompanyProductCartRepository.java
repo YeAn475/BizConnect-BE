@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import com.springboot.bizconnect.entity.Product; 
 import com.springboot.bizconnect.entity.CompanyProductCart;
 
-public interface CompanyProductCartRepository extends JpaRepository<CompanyProductCart, CompanyProductCart.companyProductNo>{
+public interface CompanyProductCartRepository extends JpaRepository<CompanyProductCart, CompanyProductCart.CompanyProductNo>{
 	// 두개의 값이 동시에 존재하는 정보가 있는지 탐색
 	@Query("SELECT p FROM Product p " +
 		       "JOIN CompanyProductCart cp ON p.productNo = cp.id.productNo " +

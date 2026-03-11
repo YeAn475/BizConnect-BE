@@ -29,7 +29,7 @@ public class FriendRequest extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "friend_request_no", nullable = false)
-    private Integer friendRequestNo;
+    private Long friendRequestNo;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_user_no", nullable = false)

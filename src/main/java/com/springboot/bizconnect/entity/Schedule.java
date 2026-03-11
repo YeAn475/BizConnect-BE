@@ -28,7 +28,7 @@ public class Schedule extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "schedule_no", nullable = false)
-    private Integer scheduleNo;
+    private Long scheduleNo;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_no", nullable = false)
