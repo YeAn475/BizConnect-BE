@@ -47,10 +47,9 @@ public class CartController {
 	@Operation(summary = "회사 상품 상세 조회", description = "회사의 상품을 조회합니다.")
 	public ResponseEntity<CompanyProductDetailResponseDto> getCartProductDetail(
 			@ParameterObject CompanyProductDetailRequestDto requestDto,
-	        @AuthenticationPrincipal CustomUserDetails userDetails) {
-	    CompanyProductDetailResponseDto responseDto = cartService.getCartProductDetail(requestDto, userDetails);
-		
-	    // 서비스 호출 시 productNo와 userDetails를 넘겨 보안 검증과 조회를 동시에 처리
+	        @AuthenticationPrincipal CustomUserDetails userDetails
+	) {
+	    CompanyProductDetailResponseDto responseDto = cartService.getCartProductDetail(requestDto, userDetails);	
 	    return ResponseEntity.ok(responseDto);
 	}
 }

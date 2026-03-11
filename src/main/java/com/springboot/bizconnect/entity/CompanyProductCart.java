@@ -24,7 +24,7 @@ public class CompanyProductCart extends BaseEntity {
     private companyProductNo no;
 
     @Column(name = "is_used", nullable = false)
-    private Boolean isUsed = Boolean.FALSE;
+    private Boolean isUsed = Boolean.TRUE;
 
     public static class companyProductNo implements Serializable {
         @Column(name = "company_no", nullable = false)

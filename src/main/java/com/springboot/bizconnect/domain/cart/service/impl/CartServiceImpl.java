@@ -47,7 +47,7 @@ public class CartServiceImpl implements CartService{
 		Long companyNo = userDetails.getCompanyNo();
 
 	    boolean isMyCompanyProduct = companyproductcartRepository
-	            .existsById_CompanyNoAndId_ProductNoAndIsUsedTrue(companyNo, requestDto.getProductNo());
+	            .existsByNo_CompanyNoAndNo_ProductNoAndIsUsedTrue(companyNo, requestDto.getProductNo());
 
 	    if (!isMyCompanyProduct) {
 	        throw new RuntimeException("해당 상품에 대한 접근 권한이 없거나 존재하지 않습니다.");

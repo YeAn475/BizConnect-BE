@@ -13,6 +13,7 @@ public interface CompanyProductCartRepository extends JpaRepository<CompanyProdu
 		       "JOIN CompanyProductCart cp ON p.productNo = cp.id.productNo " +
 		       "WHERE cp.id.companyNo = :companyNo AND cp.isUsed = true")
 	Page<Product> findAllByCompanyNoAndIsUsed(Long companyNo, Pageable pageable);
-	// 해당 회사의 제품인지 판별하는 메서
-	boolean existsById_CompanyNoAndId_ProductNoAndIsUsedTrue(Long companyNo, Long productNo);
+	// 해당 회사의 제품인지 판별하는 메서드
+	boolean existsByNo_CompanyNoAndNo_ProductNoAndIsUsedTrue(Long companyNo, Long productNo);
+	
 }
