@@ -1,5 +1,7 @@
 package com.springboot.bizconnect.domain.cart.controller;
 
+import java.util.List;
+
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.springboot.bizconnect.domain.auth.CustomUserDetails;
 import com.springboot.bizconnect.domain.cart.dto.assign.AssignProductRequestDto;
 import com.springboot.bizconnect.domain.cart.dto.assign.AssignProductResponseDto;
+import com.springboot.bizconnect.domain.cart.dto.list.ProductAdminCartListRequestDto;
+import com.springboot.bizconnect.domain.cart.dto.list.ProductAdminCartListResponseDto;
 import com.springboot.bizconnect.domain.cart.service.AdminCartService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,23 +40,31 @@ public class AdminCartController {
 		return ResponseEntity.ok(responseDto);
 	}
 	
-	@PatchMapping("/{productNo}/update")
-	@Operation(summary = "거래처 상품 사용 여부 변경", description = "운영 관리자가 거래처 장바구니에 상품의 사용 여부를 변경합니다.")
-	public ResponseEntity<?> UpdateCompanyProductCart() {
-		return null;
+	
+	@GetMapping("/companies/")
+	@Operation(summary = "업체 배정 상품 리스트 조회", description = "관리자가 특정 업체의 장바구니 리스트를 조회합니다.")
+	public ResponseEntity<List<ProductAdminCartListResponseDto>> getCompanyCartList(
+			@AuthenticationPrincipal CustomUserDetails userDetails,
+			@ParameterObject ProductAdminCartListRequestDto requestDto
+		) {
+		// 거래중인 업체 회사들을 조회
+		List<ProductAdminCartListResponseDto> responseDto = admincartservice.getCompanyCartList(userDetails, requestDto);
+		return ResponseEntity.ok(responseDto);
 	}
+	
 	
 	@GetMapping("/companies/{companyNo}")
     @Operation(summary = "특정 업체 배정 상품 조회", description = "관리자가 특정 업체의 장바구니를 조회합니다.")
     public ResponseEntity<?> getCompanyCart() {
-        // is_used가 true인 값
+        // is_used가 true인 값의 상품들 모두 조회
         return null;
     }
 	
-	@GetMapping("/companies/")
-    @Operation(summary = "업체 배정 상품 리스트조회", description = "관리자가 특정 업체의 장바구니 리스트를 조회합니다.")
-    public ResponseEntity<?> getCompanyCartList() {
-        return null;
-    }
+	@PatchMapping("/{productNo}/update")
+	@Operation(summary = "거래처 상품 사용 여부 변경", description = "운영 관리자가 거래처 장바구니에 상품의 사용 여부를 변경합니다.")
+	public ResponseEntity<?> UpdateCompanyProductCart() {
+		// request 값으로 productNo값을 넘기면 해당 회사 장바구니에 상품이 존재하는 확인 절차 후 is_used의 반대로 변경
+		return null;
+	}
 	
 }

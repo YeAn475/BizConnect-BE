@@ -34,7 +34,7 @@ public class AlarmServiceImpl implements AlarmService {
     private final UserAlarmRepository userAlarmRepository;
 
     @Override
-    @Transactional // 둘중 하나라도 저장이 안되면 rollback
+    @Transactional
     public CreateAlarmResponseDto createAlarm(CustomUserDetails userDetails, CreateAlarmRequestDto requestDto) {
         User user = userRepository.findById(userDetails.getUser().getUserNo())
                 .orElseThrow(() -> new RuntimeException("회원정보를 찾을 수 없습니다."));
@@ -146,10 +146,11 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     @Transactional
-    public void sendToCompanyMembers(User sender, Long companyNo, String title, String content) {
+    public void sendToCompanyMembers(User sender, Long companyNo, String title, String content, AlarmType alarmType) {
         Alarm alarm = alarmRepository.save(Alarm.builder()
                 .senderUserNo(sender)
                 .title(title)
+                .alarmType(alarmType)
                 .content(content)
                 .build());
 
@@ -159,6 +160,7 @@ public class AlarmServiceImpl implements AlarmService {
         for (User member : members) {
             if(member.getUserNo().equals(sender.getUserNo())) continue;
             userAlarmRepository.save(UserAlarm.builder()
+            		.no(new UserAlarm.userAlarmNo(member.getUserNo(), alarm.getAlarmNo()))
                     .user(member)
                     .alarm(alarm)
                     .isRead(false)
