@@ -1,28 +1,10 @@
-import { useState } from 'react'
-import { ShoppingCart, Building2, Users, Bell, Check, CheckCheck, Trash2 } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { ShoppingCart, Building2, Users, Bell, Check, CheckCheck, Trash2, Loader2 } from 'lucide-react'
 import clsx from 'clsx'
+import { alarmApi } from '../../services/alarm'
+import type { Alarm } from '../../types'
 
 type AlarmType = 'ORDER_REQUEST' | 'COMPANY_REGISTER_REQUEST' | 'COMPANY_CONNECT_REQUEST' | 'FRIEND_REQUEST' | 'GENERAL'
-
-interface Alarm {
-  id: number
-  type: AlarmType
-  title: string
-  content: string
-  time: string
-  isRead: boolean
-}
-
-const alarms: Alarm[] = [
-  { id: 1, type: 'ORDER_REQUEST', title: '새 주문 접수', content: '삼성전자로부터 ORD-1042 주문이 접수되었습니다. (SSD 1TB × 10개)', time: '10분 전', isRead: false },
-  { id: 2, type: 'COMPANY_REGISTER_REQUEST', title: '기업 가입 요청', content: '(주)넥스텍에서 귀사 기업에 가입 요청을 보냈습니다.', time: '30분 전', isRead: false },
-  { id: 3, type: 'FRIEND_REQUEST', title: '친구 요청', content: '박지수님(LG전자)이 비즈 파트너 요청을 보냈습니다.', time: '1시간 전', isRead: false },
-  { id: 4, type: 'COMPANY_CONNECT_REQUEST', title: '기업 연결 요청', content: 'POSCO에서 비즈니스 연결 요청을 보냈습니다.', time: '2시간 전', isRead: false },
-  { id: 5, type: 'GENERAL', title: '시스템 공지', content: '4월 15일(월) 새벽 2:00 ~ 4:00 정기 점검이 예정되어 있습니다.', time: '3시간 전', isRead: false },
-  { id: 6, type: 'ORDER_REQUEST', title: '주문 상태 변경', content: 'ORD-1041 주문이 답변완료 상태로 변경되었습니다.', time: '어제', isRead: true },
-  { id: 7, type: 'FRIEND_REQUEST', title: '친구 요청 수락', content: '최영준님이 귀하의 비즈 파트너 요청을 수락했습니다.', time: '어제', isRead: true },
-  { id: 8, type: 'GENERAL', title: '이용 약관 업데이트', content: 'BizConnect 이용약관이 업데이트되었습니다. 2024년 5월 1일부터 적용됩니다.', time: '2일 전', isRead: true },
-]
 
 const typeConfig: Record<AlarmType, { icon: typeof ShoppingCart; color: string; bg: string; label: string }> = {
   ORDER_REQUEST: { icon: ShoppingCart, color: 'text-blue-600', bg: 'bg-blue-50', label: '주문' },
@@ -36,18 +18,38 @@ const filterTabs = ['전체', '주문', '기업 가입', '기업 연결', '친�
 
 export default function Notifications() {
   const [filter, setFilter] = useState<string>('전체')
-  const [items, setItems] = useState(alarms)
+  const [items, setItems] = useState<Alarm[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    alarmApi.getList()
+      .then(setItems)
+      .catch(console.error)
+      .finally(() => setLoading(false))
+  }, [])
 
   const filtered = items.filter(a => {
     if (filter === '전체') return true
-    return typeConfig[a.type].label === filter
+    const cfg = typeConfig[a.alarmType as AlarmType]
+    return cfg?.label === filter
   })
 
   const unreadCount = items.filter(a => !a.isRead).length
 
-  const markAllRead = () => setItems(prev => prev.map(a => ({ ...a, isRead: true })))
-  const markRead = (id: number) => setItems(prev => prev.map(a => a.id === id ? { ...a, isRead: true } : a))
-  const deleteAlarm = (id: number) => setItems(prev => prev.filter(a => a.id !== id))
+  const markAllRead = () => {
+    items.filter(a => !a.isRead).forEach(a => alarmApi.markRead(a.alarmNo).catch(console.error))
+    setItems(prev => prev.map(a => ({ ...a, isRead: true })))
+  }
+  const markRead = (alarmNo: number) => {
+    alarmApi.markRead(alarmNo).catch(console.error)
+    setItems(prev => prev.map(a => a.alarmNo === alarmNo ? { ...a, isRead: true } : a))
+  }
+  const deleteAlarm = (alarmNo: number) => {
+    alarmApi.delete(alarmNo).catch(console.error)
+    setItems(prev => prev.filter(a => a.alarmNo !== alarmNo))
+  }
+
+  if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary-500" size={32} /></div>
 
   return (
     <div className="max-w-3xl mx-auto space-y-5">
@@ -96,10 +98,10 @@ export default function Notifications() {
           </div>
         )}
         {filtered.map(alarm => {
-          const cfg = typeConfig[alarm.type]
+          const cfg = typeConfig[alarm.alarmType as AlarmType] ?? typeConfig.GENERAL
           return (
             <div
-              key={alarm.id}
+              key={alarm.alarmNo}
               className={clsx(
                 'flex items-start gap-4 p-4 rounded-xl border transition-colors',
                 alarm.isRead
@@ -120,12 +122,12 @@ export default function Notifications() {
                       )}
                     </div>
                     <p className="text-sm text-gray-600 mt-0.5">{alarm.content}</p>
-                    <p className="text-xs text-gray-400 mt-1">{alarm.time}</p>
+                    <p className="text-xs text-gray-400 mt-1">{alarm.createdAt}</p>
                   </div>
                   <div className="flex items-center gap-1 flex-shrink-0">
                     {!alarm.isRead && (
                       <button
-                        onClick={() => markRead(alarm.id)}
+                        onClick={() => markRead(alarm.alarmNo)}
                         className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
                         title="읽음 처리"
                       >
@@ -133,7 +135,7 @@ export default function Notifications() {
                       </button>
                     )}
                     <button
-                      onClick={() => deleteAlarm(alarm.id)}
+                      onClick={() => deleteAlarm(alarm.alarmNo)}
                       className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors"
                       title="삭제"
                     >
@@ -143,7 +145,7 @@ export default function Notifications() {
                 </div>
 
                 {/* Action buttons for actionable alarms */}
-                {!alarm.isRead && (alarm.type === 'FRIEND_REQUEST' || alarm.type === 'COMPANY_CONNECT_REQUEST' || alarm.type === 'COMPANY_REGISTER_REQUEST') && (
+                {!alarm.isRead && (['FRIEND_REQUEST', 'COMPANY_CONNECT_REQUEST', 'COMPANY_REGISTER_REQUEST'] as string[]).includes(alarm.alarmType) && (
                   <div className="flex gap-2 mt-2">
                     <button className="btn-primary text-xs py-1 px-3">수락</button>
                     <button className="btn-secondary text-xs py-1 px-3">거절</button>

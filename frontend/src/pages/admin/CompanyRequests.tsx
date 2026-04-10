@@ -1,31 +1,69 @@
-import { useState } from 'react'
-import { Search, Building2, User, Check, X, Clock, CheckCircle, XCircle } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Search, Building2, User, Check, X, Clock, CheckCircle, XCircle, Loader2 } from 'lucide-react'
 import clsx from 'clsx'
-
-const requests = [
-  { id: 1, user: { name: '김철민', email: 'kim@nextek.com', position: '대리' }, company: { name: '(주)넥스텍', affiliation: 'IT·전자' }, status: 'PENDING', createdAt: '2024-04-10 14:00' },
-  { id: 2, user: { name: '박지수', email: 'jisu@nextsoft.co.kr', position: '매니저' }, company: { name: '넥스트소프트', affiliation: '소프트웨어' }, status: 'PENDING', createdAt: '2024-04-10 11:30' },
-  { id: 3, user: { name: '오민석', email: 'ms.oh@globaltech.com', position: '팀장' }, company: { name: '글로벌테크', affiliation: 'IT·전자' }, status: 'APPROVED', createdAt: '2024-04-09 16:00' },
-  { id: 4, user: { name: '이정현', email: 'jh.lee@techcorp.kr', position: '대리' }, company: { name: '테크코프', affiliation: '소프트웨어' }, status: 'REJECTED', createdAt: '2024-04-09 10:00' },
-  { id: 5, user: { name: '강수연', email: 'sy.kang@innovate.co.kr', position: '매니저' }, company: { name: '이노베이트', affiliation: 'IT·전자' }, status: 'PENDING', createdAt: '2024-04-08 14:30' },
-]
+import { companyAlarmApi } from '../../services/companyAlarm'
+import type { CompanyJoinRequest } from '../../types'
 
 const statusConfig: Record<string, { label: string; icon: typeof Clock; color: string; className: string }> = {
-  PENDING: { label: '검토중', icon: Clock, color: 'text-yellow-500', className: 'badge-pending' },
+  PENDING:  { label: '검토중', icon: Clock, color: 'text-yellow-500', className: 'badge-pending' },
   APPROVED: { label: '승인됨', icon: CheckCircle, color: 'text-green-500', className: 'badge-active' },
   REJECTED: { label: '거절됨', icon: XCircle, color: 'text-red-500', className: 'badge-rejected' },
 }
 
 export default function CompanyRequests() {
+  const [requests, setRequests] = useState<CompanyJoinRequest[]>([])
+  const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('전체')
-  const [selected, setSelected] = useState<typeof requests[0] | null>(null)
+  const [selected, setSelected] = useState<CompanyJoinRequest | null>(null)
   const [rejectReason, setRejectReason] = useState('')
+  const [processing, setProcessing] = useState(false)
+
+  // 알림 목록에서 가입 요청을 가져옴 (CompanyAlarm은 별도 조회 API 미구현, 알림 referenceNo 기반)
+  // 실제 구현 시 별도 API 엔드포인트 필요
+  useEffect(() => {
+    setLoading(false) // API 미구현 - UI만 표시
+  }, [])
+
+  const handleApprove = async () => {
+    if (!selected) return
+    setProcessing(true)
+    try {
+      await companyAlarmApi.approve(selected.companyRequestNo)
+      setRequests(prev => prev.map(r =>
+        r.companyRequestNo === selected.companyRequestNo ? { ...r, status: 'APPROVED' } : r
+      ))
+      setSelected(null)
+    } catch (e: any) {
+      alert('승인 실패: ' + e.message)
+    } finally {
+      setProcessing(false)
+    }
+  }
+
+  const handleReject = async () => {
+    if (!selected) return
+    setProcessing(true)
+    try {
+      await companyAlarmApi.reject(selected.companyRequestNo, rejectReason)
+      setRequests(prev => prev.map(r =>
+        r.companyRequestNo === selected.companyRequestNo ? { ...r, status: 'REJECTED' } : r
+      ))
+      setSelected(null)
+      setRejectReason('')
+    } catch (e: any) {
+      alert('거절 실패: ' + e.message)
+    } finally {
+      setProcessing(false)
+    }
+  }
 
   const filtered = requests.filter(r =>
     (statusFilter === '전체' || r.status === statusFilter) &&
     (r.user.name.includes(search) || r.company.name.includes(search))
   )
+
+  if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary-500" size={32} /></div>
 
   const stats = {
     total: requests.length,
@@ -87,7 +125,7 @@ export default function CompanyRequests() {
         {filtered.map(req => {
           const cfg = statusConfig[req.status]
           return (
-            <div key={req.id} className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-sm transition-shadow">
+            <div key={req.companyRequestNo} className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-sm transition-shadow">
               <div className="flex items-start gap-4">
                 {/* Icons */}
                 <div className="flex gap-2 flex-shrink-0">
@@ -102,7 +140,6 @@ export default function CompanyRequests() {
                     <div>
                       <div className="flex items-center gap-2 mb-1">
                         <h3 className="font-semibold text-gray-900">{req.user.name}</h3>
-                        <span className="text-xs text-gray-400">({req.user.position})</span>
                         <span className={cfg.className}>{cfg.label}</span>
                       </div>
                       <p className="text-sm text-gray-500">{req.user.email}</p>
@@ -114,7 +151,6 @@ export default function CompanyRequests() {
                     <Building2 size={14} className="text-gray-500" />
                     <div>
                       <span className="text-sm font-semibold text-gray-900">{req.company.name}</span>
-                      <span className="text-xs text-gray-400 ml-2">{req.company.affiliation}</span>
                     </div>
                   </div>
                 </div>
@@ -160,7 +196,7 @@ export default function CompanyRequests() {
             <div className="p-6 space-y-4">
               <div className="bg-gray-50 rounded-xl p-4">
                 <p className="text-sm text-gray-600 mb-1">요청자</p>
-                <p className="font-semibold text-gray-900">{selected.user.name} ({selected.user.position})</p>
+                <p className="font-semibold text-gray-900">{selected.user.name}</p>
                 <p className="text-sm text-gray-500">{selected.user.email}</p>
                 <p className="text-sm font-medium text-primary-600 mt-2">→ {selected.company.name}</p>
               </div>
@@ -175,12 +211,14 @@ export default function CompanyRequests() {
               </div>
             </div>
             <div className="flex gap-3 px-6 py-4 border-t border-gray-200">
-              <button onClick={() => setSelected(null)} className="btn-secondary flex-1">취소</button>
-              <button className="flex-1 flex items-center justify-center gap-2 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium">
-                <X size={14} /> 거절
+              <button onClick={() => setSelected(null)} disabled={processing} className="btn-secondary flex-1">취소</button>
+              <button onClick={handleReject} disabled={processing}
+                className="flex-1 flex items-center justify-center gap-2 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium disabled:opacity-50">
+                {processing ? <Loader2 size={14} className="animate-spin" /> : <X size={14} />} 거절
               </button>
-              <button className="flex-1 flex items-center justify-center gap-2 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium">
-                <Check size={14} /> 승인
+              <button onClick={handleApprove} disabled={processing}
+                className="flex-1 flex items-center justify-center gap-2 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium disabled:opacity-50">
+                {processing ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />} 승인
               </button>
             </div>
           </div>

@@ -1,15 +1,28 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Eye, EyeOff, Zap } from 'lucide-react'
+import { Eye, EyeOff, Zap, Loader2 } from 'lucide-react'
+import { authApi } from '../../services/auth'
 
 export default function Login() {
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [form, setForm] = useState({ email: '', password: '' })
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    navigate('/dashboard')
+    setError(null)
+    setLoading(true)
+    try {
+      const res = await authApi.login(form)
+      const role = res.role ?? localStorage.getItem('role')
+      navigate(role === 'ADMIN' ? '/admin/dashboard' : '/dashboard')
+    } catch (e: any) {
+      setError(e.message ?? '로그인에 실패했습니다.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -34,6 +47,12 @@ export default function Login() {
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-6">로그인</h2>
 
+          {error && (
+            <div className="mb-4 bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-xl">
+              {error}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">이메일</label>
@@ -44,6 +63,7 @@ export default function Login() {
                 className="input"
                 placeholder="이메일을 입력하세요"
                 required
+                disabled={loading}
               />
             </div>
 
@@ -78,7 +98,8 @@ export default function Login() {
               </a>
             </div>
 
-            <button type="submit" className="btn-primary w-full py-3 text-base mt-2">
+            <button type="submit" disabled={loading} className="btn-primary w-full py-3 text-base mt-2 flex items-center justify-center gap-2">
+              {loading && <Loader2 size={18} className="animate-spin" />}
               로그인
             </button>
           </form>

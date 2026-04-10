@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Eye, EyeOff, Zap, CheckCircle2 } from 'lucide-react'
+import { Eye, EyeOff, Zap, CheckCircle2, Loader2 } from 'lucide-react'
+import { authApi } from '../../services/auth'
 
 const steps = ['계정 정보', '개인 정보', '기업 연결']
 
@@ -8,6 +9,8 @@ export default function SignUp() {
   const navigate = useNavigate()
   const [step, setStep] = useState(0)
   const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [form, setForm] = useState({
     email: '', password: '', confirmPassword: '',
     name: '', phoneNumber: '', address: '',
@@ -17,10 +20,33 @@ export default function SignUp() {
   const update = (key: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm(f => ({ ...f, [key]: e.target.value }))
 
-  const handleNext = (e: React.FormEvent) => {
+  const handleNext = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (step < steps.length - 1) setStep(s => s + 1)
-    else navigate('/login')
+    setError(null)
+    if (step < steps.length - 1) {
+      if (step === 0 && form.password !== form.confirmPassword) {
+        setError('비밀번호가 일치하지 않습니다.')
+        return
+      }
+      setStep(s => s + 1)
+      return
+    }
+    // 최종 단계: API 호출
+    setLoading(true)
+    try {
+      await authApi.signup({
+        email: form.email,
+        password: form.password,
+        name: form.name,
+        phoneNumber: form.phoneNumber,
+        address: form.address,
+      })
+      navigate('/login')
+    } catch (e: any) {
+      setError(e.message ?? '회원가입에 실패했습니다.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
