@@ -1,4 +1,4 @@
-package com.springboot.bizconnect.domain.product.dto.detail;
+package com.springboot.bizconnect.domain.cart.dto.detail;
 
 import java.time.LocalDateTime;
 
@@ -8,12 +8,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductDetailResponseDto {
+public class CompanyProductDetailResponseDto {
 	private Long productNo;
 	private String unitName;
 	private String categoryName;
@@ -26,3 +27,4 @@ public class ProductDetailResponseDto {
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
 }
+

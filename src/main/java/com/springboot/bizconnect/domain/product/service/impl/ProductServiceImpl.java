@@ -24,7 +24,7 @@ import com.springboot.bizconnect.entity.Unit;
 import com.springboot.bizconnect.entity.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springdoc.core.service.GenericResponseService;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,7 +43,6 @@ public class ProductServiceImpl implements ProductService {
     private final ProductStatusRepository productStatusRepository;
     private final ProductRepository productRepository;
     private final CloudinaryService cloudinaryService;
-//    private final GenericResponseService responseBuilder;
 
     @Override
     public CreateProductResponseDto createProduct(CustomUserDetails userDetails, CreateProductRequestDto requestDto) {
@@ -56,7 +55,7 @@ public class ProductServiceImpl implements ProductService {
             throw new RuntimeException("권한이 없습니다.");
         }
 
-        // 이름으로 각 마스터 데이터 조회 → no 매핑
+        // 이름으로 각 마스터 데이터 조회
         Unit unit = unitRepository.findByName(requestDto.getUnit())
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 단위입니다: " + requestDto.getUnit()));
 

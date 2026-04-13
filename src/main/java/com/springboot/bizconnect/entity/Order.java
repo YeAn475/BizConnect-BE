@@ -29,7 +29,7 @@ public class Order extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_no", nullable = false)
-    private Integer orderNo;
+    private Long orderNo;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_no", nullable = false)

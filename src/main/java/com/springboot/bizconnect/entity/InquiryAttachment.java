@@ -29,7 +29,7 @@ public class InquiryAttachment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "inquiry_attachment_no", nullable = false)
-    private Integer inquiry_attachment_no;
+    private Long inquiry_attachment_no;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "inquiry_no", nullable = false)

@@ -1,4 +1,6 @@
-package com.springboot.bizconnect.domain.product.dto.list;
+package com.springboot.bizconnect.domain.cart.dto.assign;
+
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,14 +8,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Setter
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductListResponseDto {
-	private Long productNo;
-	private String name;
-	private String imageUrl;
-
+public class AssignProductResponseDto {
+	private List<String> productName;
 }

@@ -17,7 +17,7 @@ COPY src ./src
 RUN gradle clean build -x test --no-daemon
 
 # 2단계: 실행 스테이지
-FROM openjdk:21-jdk-slim
+FROM eclipse-temurin:21-jdk-alpine
 
 WORKDIR /app
 
