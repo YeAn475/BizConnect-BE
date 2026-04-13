@@ -33,7 +33,7 @@ services:
       DB_USERNAME: lsh
       DB_PASSWORD: lsh
     ports:
-      - "8301:8301"
+      - "80:8301"
     depends_on:
       mariadb:
         condition: service_healthy
