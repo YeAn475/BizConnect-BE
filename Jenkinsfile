@@ -45,7 +45,7 @@ pipeline {
                     docker run -d \
                       --name ${CONTAINER_NAME} \
                       --network bizconnect_bizconnect-network \
-                      -e SPRING_PROFILE=dev \
+                      -e SPRING_PROFILE=prod \
                       -e SERVER_PORT=8301 \
                       -e DB_HOST=mariadb \
                       -e DB_PORT=3306 \
