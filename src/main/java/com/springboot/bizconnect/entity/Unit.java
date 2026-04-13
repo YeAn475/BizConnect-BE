@@ -23,7 +23,7 @@ public class Unit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "unit_no", nullable = false)
-    private Integer unitNo;
+    private Long unitNo;
 
     @Column(name = "name", length = 100, nullable = false)
     private String name;

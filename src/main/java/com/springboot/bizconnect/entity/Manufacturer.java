@@ -23,7 +23,7 @@ public class Manufacturer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "manufacturer_no", length = 100, nullable = false)
-    private Integer manufacturerNo;
+    private Long manufacturerNo;
 
     @Column(name = "name", nullable = false)
     private String name;

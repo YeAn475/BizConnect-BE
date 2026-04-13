@@ -30,7 +30,7 @@ public class Inquiry extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "inquiry_no", nullable = false)
-    private Integer inquiryNo;
+    private Long inquiryNo;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_no", nullable = false)

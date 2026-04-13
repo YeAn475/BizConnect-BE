@@ -53,7 +53,6 @@ public class CompanyServiceImpl implements CompanyService {
     private final UserRepository userRepository;
     private final AffiliationRepository affiliationRepository;
     private final BranchRepository branchRepository;
-    private final RoleRepository roleRepository;
     private final CorporateAccountRepository corporateAccountRepository;
     private final AccountRepository accountRepository;
     private final BusinessRegistrationRepository businessRegistrationRepository;
