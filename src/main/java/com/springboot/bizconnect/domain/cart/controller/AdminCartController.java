@@ -55,7 +55,8 @@ public class AdminCartController {
 	
 	@GetMapping("/companies/{companyNo}")
     @Operation(summary = "특정 업체 배정 상품 조회", description = "관리자가 특정 업체의 장바구니를 조회합니다.")
-    public ResponseEntity<?> getCompanyCart() {
+    public ResponseEntity<?> getCompanyCart(
+    		@AuthenticationPrincipal CustomUserDetails userDetails) {
         // is_used가 true인 값의 상품들 모두 조회
         return null;
     }
@@ -66,5 +67,4 @@ public class AdminCartController {
 		// request 값으로 productNo값을 넘기면 해당 회사 장바구니에 상품이 존재하는 확인 절차 후 is_used의 반대로 변경
 		return null;
 	}
-	
 }
