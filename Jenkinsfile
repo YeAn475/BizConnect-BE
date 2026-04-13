@@ -71,7 +71,7 @@ pipeline {
                     echo 'Checking container logs...'
                     docker logs ${CONTAINER_NAME} --tail=10
 
-                    echo '✅ Deployment complete!'
+                    echo 'Deployment complete!'
                 """
             }
         }
@@ -79,10 +79,10 @@ pipeline {
 
     post {
         success {
-            echo '✅ Deployment successful!'
+            echo 'Deployment successful!'
         }
         failure {
-            echo '❌ Deployment failed!'
+            echo 'Deployment failed!'
             sh 'docker logs ${CONTAINER_NAME} || true'
         }
         always {
