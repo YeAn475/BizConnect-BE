@@ -52,7 +52,7 @@ pipeline {
                       -e DB_NAME=bizconnect \
                       -e DB_USERNAME=lsh \
                       -e DB_PASSWORD=lsh \
-                      -p 8301:8301 \
+                      -p 80:8301 \
                       ${DOCKER_IMAGE}:latest
                 """
             }
