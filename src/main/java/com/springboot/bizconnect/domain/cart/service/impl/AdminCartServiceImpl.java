@@ -3,6 +3,10 @@ package com.springboot.bizconnect.domain.cart.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.springboot.bizconnect.domain.cart.dto.list.CompanyProductListRequestDto;
+import com.springboot.bizconnect.domain.cart.dto.list.CompanyProductListResponseDto;
+import com.springboot.bizconnect.domain.cart.dto.update.UpdateCartProductRequestDto;
+import com.springboot.bizconnect.domain.cart.dto.update.UpdateCartProductResponseDto;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -105,8 +109,44 @@ public class AdminCartServiceImpl implements AdminCartService{
 	            .getContent();
 				
 	}
-	
-	
-	
 
+	@Override
+	public List<CompanyProductListResponseDto> getCompanyCart(CustomUserDetails userDetails, Long companyNo, CompanyProductListRequestDto requestDto) {
+		if (userDetails.getUser().getRole().getRoleNo() != 3L) {
+			throw new RuntimeException("해당 기능을 수행할 권한이 없습니다. (관리자 전용)");
+		}
+
+		PageRequest pageRequest = PageRequest.of(requestDto.getPage(), requestDto.getSize());
+
+		return companyProductCartRepository.findByNo_CompanyNo(companyNo, pageRequest)
+				.map(companyProductCart -> CompanyProductListResponseDto.builder()
+						.productNo(companyProductCart.getProduct().getProductNo())
+						.name(companyProductCart.getProduct().getName())
+						.imageUrl(companyProductCart.getProduct().getImageUrl())
+						.isUsed(companyProductCart.getIsUsed())
+						.build())
+				.getContent();
+	}
+
+	@Override
+	public UpdateCartProductResponseDto UpdateCompanyProductCart(CustomUserDetails userDetails, UpdateCartProductRequestDto requestDto) {
+		if (userDetails.getUser().getRole().getRoleNo() != 3L) {
+			throw new RuntimeException("해당 기능을 수행할 권한이 없습니다. (관리자 전용)");
+		}
+
+		int updatedCount = 0;
+
+		for (Long productNo : requestDto.getProductNos()) {
+			CompanyProductCart cart = companyProductCartRepository
+					.findByNo_CompanyNoAndNo_ProductNo(requestDto.getCompanyNo(), productNo)
+					.orElseThrow(() -> new RuntimeException("해당 상품이 장바구니에 존재하지 않습니다: " + productNo));
+
+			// isUsed 토글
+			cart.setIsUsed(!cart.getIsUsed());
+			companyProductCartRepository.save(cart);
+			updatedCount++;
+		}
+
+		return new UpdateCartProductResponseDto(updatedCount + "개 상품의 사용 여부가 변경되었습니다.");
+	}
 }
