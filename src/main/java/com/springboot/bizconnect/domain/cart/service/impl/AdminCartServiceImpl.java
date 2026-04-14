@@ -3,6 +3,8 @@ package com.springboot.bizconnect.domain.cart.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.springboot.bizconnect.domain.cart.dto.list.CompanyProductListRequestDto;
+import com.springboot.bizconnect.domain.cart.dto.list.CompanyProductListResponseDto;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -105,8 +107,21 @@ public class AdminCartServiceImpl implements AdminCartService{
 	            .getContent();
 				
 	}
-	
-	
-	
 
+	@Override
+	public List<CompanyProductListResponseDto> getCompanyCart(CustomUserDetails userDetails, Long companyNo, CompanyProductListRequestDto requestDto) {
+		if (userDetails.getUser().getRole().getRoleNo() != 3L) {
+			throw new RuntimeException("해당 기능을 수행할 권한이 없습니다. (관리자 전용)");
+		}
+
+		PageRequest pageRequest = PageRequest.of(requestDto.getPage(), requestDto.getSize());
+
+		return companyProductCartRepository.findAllByCompanyNoAndIsUsed(companyNo, pageRequest)
+				.map(product -> CompanyProductListResponseDto.builder()
+						.productNo(product.getProductNo())
+						.name(product.getName())
+						.imageUrl(product.getImageUrl())
+						.build())
+				.getContent();
+	}
 }

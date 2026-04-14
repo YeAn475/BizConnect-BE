@@ -2,11 +2,14 @@ package com.springboot.bizconnect.domain.cart.controller;
 
 import java.util.List;
 
+import com.springboot.bizconnect.domain.cart.dto.list.CompanyProductListRequestDto;
+import com.springboot.bizconnect.domain.cart.dto.list.CompanyProductListResponseDto;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,15 +58,22 @@ public class AdminCartController {
 	
 	@GetMapping("/companies/{companyNo}")
     @Operation(summary = "특정 업체 배정 상품 조회", description = "관리자가 특정 업체의 장바구니를 조회합니다.")
-    public ResponseEntity<?> getCompanyCart(
-    		@AuthenticationPrincipal CustomUserDetails userDetails) {
-        // is_used가 true인 값의 상품들 모두 조회
-        return null;
+    public ResponseEntity<List<CompanyProductListResponseDto>> getCompanyCart(
+    		@AuthenticationPrincipal CustomUserDetails userDetails,
+		    @PathVariable Long companyNo,
+			@ParameterObject CompanyProductListRequestDto requestDto
+	) {
+		// 해당 업체에 존재하는 상품일것
+        // 해당 상품의 is_used가 true인 값들 모두 조회
+		List<CompanyProductListResponseDto> responseDto = admincartservice.getCompanyCart(userDetails, companyNo, requestDto);
+        return ResponseEntity.ok(responseDto);
     }
 	
 	@PatchMapping("/{productNo}/update")
 	@Operation(summary = "거래처 상품 사용 여부 변경", description = "운영 관리자가 거래처 장바구니에 상품의 사용 여부를 변경합니다.")
-	public ResponseEntity<?> UpdateCompanyProductCart() {
+	public ResponseEntity<?> UpdateCompanyProductCart(
+			@AuthenticationPrincipal CustomUserDetails userDetails
+	) {
 		// request 값으로 productNo값을 넘기면 해당 회사 장바구니에 상품이 존재하는 확인 절차 후 is_used의 반대로 변경
 		return null;
 	}
