@@ -11,6 +11,8 @@ import org.springframework.data.repository.query.Param;
 import com.springboot.bizconnect.entity.Company;
 import com.springboot.bizconnect.entity.CompanyProductCart;
 
+import java.util.Optional;
+
 public interface CompanyProductCartRepository extends JpaRepository<CompanyProductCart, CompanyProductCart.CompanyProductNo>{
 	// 두개의 값이 동시에 존재하는 정보가 있는지 탐색
 	@Query("SELECT p FROM Product p " +
@@ -22,4 +24,9 @@ public interface CompanyProductCartRepository extends JpaRepository<CompanyProdu
 	
 	@Query("SELECT DISTINCT cp.company FROM CompanyProductCart cp WHERE cp.isUsed = true")
 	Page<Company> findDistinctCompaniesWithUsedCart(Pageable pageable);
+
+	Page<CompanyProductCart> findByNo_CompanyNo(Long companyNo, Pageable pageable);
+
+	Optional<CompanyProductCart> findByNo_CompanyNoAndNo_ProductNo(Long companyNo, Long productNo);
+
 }

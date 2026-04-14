@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.springboot.bizconnect.domain.cart.dto.list.CompanyProductListRequestDto;
 import com.springboot.bizconnect.domain.cart.dto.list.CompanyProductListResponseDto;
+import com.springboot.bizconnect.domain.cart.dto.update.UpdateCartProductRequestDto;
+import com.springboot.bizconnect.domain.cart.dto.update.UpdateCartProductResponseDto;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -71,10 +73,12 @@ public class AdminCartController {
 	
 	@PatchMapping("/{productNo}/update")
 	@Operation(summary = "거래처 상품 사용 여부 변경", description = "운영 관리자가 거래처 장바구니에 상품의 사용 여부를 변경합니다.")
-	public ResponseEntity<?> UpdateCompanyProductCart(
-			@AuthenticationPrincipal CustomUserDetails userDetails
+	public ResponseEntity<UpdateCartProductResponseDto> UpdateCompanyProductCart(
+			@AuthenticationPrincipal CustomUserDetails userDetails,
+			@ParameterObject UpdateCartProductRequestDto requestDto
 	) {
 		// request 값으로 productNo값을 넘기면 해당 회사 장바구니에 상품이 존재하는 확인 절차 후 is_used의 반대로 변경
-		return null;
+		UpdateCartProductResponseDto responseDto = admincartservice.UpdateCompanyProductCart(userDetails, requestDto);
+		return ResponseEntity.ok(responseDto);
 	}
 }

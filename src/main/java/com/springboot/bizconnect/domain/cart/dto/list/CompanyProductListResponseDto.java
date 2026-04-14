@@ -15,4 +15,5 @@ public class CompanyProductListResponseDto {
     private Long productNo;
     private String name;
     private String imageUrl;
+    private boolean isUsed;
 }
