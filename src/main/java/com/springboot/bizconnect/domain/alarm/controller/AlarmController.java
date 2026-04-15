@@ -29,9 +29,9 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/alarm")
 @Tag(name = "Alarm", description = "알람 관련 API")
-@RequiredArgsConstructor
 public class AlarmController {
 
     private final AlarmService alarmService;
