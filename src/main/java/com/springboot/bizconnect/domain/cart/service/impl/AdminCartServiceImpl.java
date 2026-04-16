@@ -45,7 +45,11 @@ public class AdminCartServiceImpl implements AdminCartService{
 	        throw new RuntimeException("해당 기능을 수행할 권한이 없습니다. (관리자 전용)");
 	    }
 		
-		Company company = companyRepository.findById(requestDto.getCompanyNo())
+		Long supplierCompanyNo = userDetails.getUser().getCompany().getCompanyNo();
+		Company supplierCompany = companyRepository.findById(supplierCompanyNo)
+				.orElseThrow(() -> new RuntimeException("공급사 정보를 찾을 수 없습니다."));
+
+		Company company = companyRepository.findById(requestDto.getBuyerCompanyNo())
 	            .orElseThrow(() -> new RuntimeException("존재하지 않는 회사입니다."));
 
 	    List<CompanyProductCart> cartEntities = new ArrayList<>();
@@ -61,11 +65,12 @@ public class AdminCartServiceImpl implements AdminCartService{
 	        }
 
 	        CompanyProductCart cart = CompanyProductCart.builder()
-	                .no(new CompanyProductCart.CompanyProductNo(requestDto.getCompanyNo(), pNo))
-	                .company(company)
-	                .product(product)
-	                .isUsed(true)
-	                .build();
+					.no(new CompanyProductCart.CompanyProductNo(supplierCompanyNo, requestDto.getBuyerCompanyNo(), pNo))
+					.supplierCompany(supplierCompany)
+					.buyerCompany(company)  // company → buyerCompany
+					.product(product)
+					.isUsed(true)
+					.build();
 
 	        cartEntities.add(cart);
 	        productNamesList.add(product.getName()); // 리스트에 이름 추가
@@ -80,7 +85,7 @@ public class AdminCartServiceImpl implements AdminCartService{
         // 작성하신 sendToCompanyMembers 활용
         alarmService.sendToCompanyMembers(
         	    userDetails.getUser(),        // 1. .getUserNo()를 빼고 User 객체 자체를 전달
-        	    requestDto.getCompanyNo(),   // 2. 수신 회사 번호
+        	    requestDto.getBuyerCompanyNo(),   // 2. 수신 회사 번호
         	    alarmTitle,                  // 3. 제목
         	    alarmContent,                // 4. 내용
         	    AlarmType.GENERAL            // 5. 누락됐던 알람 타입 추가
@@ -99,49 +104,53 @@ public class AdminCartServiceImpl implements AdminCartService{
 		if (userDetails.getUser().getRole().getRoleNo() != 3L) {
 	        throw new RuntimeException("해당 기능을 수행할 권한이 없습니다. (관리자 전용)");
 	    }
+		// 존재하는 회사인지 조건
+		Long supplierCompanyNo = userDetails.getUser().getCompany().getCompanyNo();
+
 		PageRequest pageRequest = PageRequest.of(requestDto.getPage(), requestDto.getSize());
 
-	    return companyProductCartRepository.findDistinctCompaniesWithUsedCart(pageRequest)
-	            .map(company -> ProductAdminCartListResponseDto.builder()
-	                    .companyNo(company.getCompanyNo())
-	                    .companyName(company.getName())
-	                    .build())
-	            .getContent();
-				
+		return companyProductCartRepository.findDistinctBuyersBySupplier(supplierCompanyNo, pageRequest)
+				.map(company -> ProductAdminCartListResponseDto.builder()
+						.buyerCompanyNo(company.getCompanyNo())
+						.buyerCompanyName(company.getName())
+						.build())
+				.getContent();
 	}
 
 	@Override
-	public List<CompanyProductListResponseDto> getCompanyCart(CustomUserDetails userDetails, Long companyNo, CompanyProductListRequestDto requestDto) {
+	public List<CompanyProductListResponseDto> getCompanyCart(CustomUserDetails userDetails, Long buyerCompanyNo, CompanyProductListRequestDto requestDto) {
 		if (userDetails.getUser().getRole().getRoleNo() != 3L) {
 			throw new RuntimeException("해당 기능을 수행할 권한이 없습니다. (관리자 전용)");
 		}
 
+		Long supplierCompanyNo = userDetails.getUser().getCompany().getCompanyNo();
 		PageRequest pageRequest = PageRequest.of(requestDto.getPage(), requestDto.getSize());
 
-		return companyProductCartRepository.findByNo_CompanyNo(companyNo, pageRequest)
-				.map(companyProductCart -> CompanyProductListResponseDto.builder()
-						.productNo(companyProductCart.getProduct().getProductNo())
-						.name(companyProductCart.getProduct().getName())
-						.imageUrl(companyProductCart.getProduct().getImageUrl())
-						.isUsed(companyProductCart.getIsUsed())
+
+
+		return companyProductCartRepository.findByNo_SupplierCompanyNoAndNo_BuyerCompanyNo(supplierCompanyNo, buyerCompanyNo, pageRequest)
+				.map(cart -> CompanyProductListResponseDto.builder()
+						.productNo(cart.getProduct().getProductNo())
+						.name(cart.getProduct().getName())
+						.imageUrl(cart.getProduct().getImageUrl())
+						.isUsed(cart.getIsUsed())
 						.build())
 				.getContent();
 	}
 
 	@Override
 	public UpdateCartProductResponseDto UpdateCompanyProductCart(CustomUserDetails userDetails, UpdateCartProductRequestDto requestDto) {
-		if (userDetails.getUser().getRole().getRoleNo() != 3L) {
-			throw new RuntimeException("해당 기능을 수행할 권한이 없습니다. (관리자 전용)");
-		}
-
+		Long supplierCompanyNo = userDetails.getUser().getCompany().getCompanyNo();
 		int updatedCount = 0;
 
 		for (Long productNo : requestDto.getProductNos()) {
 			CompanyProductCart cart = companyProductCartRepository
-					.findByNo_CompanyNoAndNo_ProductNo(requestDto.getCompanyNo(), productNo)
+					.findByNo_SupplierCompanyNoAndNo_BuyerCompanyNoAndNo_ProductNo(
+							supplierCompanyNo,
+							requestDto.getBuyerCompanyNo(),
+							productNo)
 					.orElseThrow(() -> new RuntimeException("해당 상품이 장바구니에 존재하지 않습니다: " + productNo));
 
-			// isUsed 토글
 			cart.setIsUsed(!cart.getIsUsed());
 			companyProductCartRepository.save(cart);
 			updatedCount++;
