@@ -1,6 +1,7 @@
 package com.springboot.bizconnect.domain.product.service.impl;
 
 import com.springboot.bizconnect.domain.auth.CustomUserDetails;
+import com.springboot.bizconnect.domain.company.repository.CompanyRepository;
 import com.springboot.bizconnect.domain.image.CloudinaryService;
 import com.springboot.bizconnect.domain.product.dto.create.CreateProductRequestDto;
 import com.springboot.bizconnect.domain.product.dto.create.CreateProductResponseDto;
@@ -17,6 +18,7 @@ import com.springboot.bizconnect.domain.product.repository.UnitRepository;
 import com.springboot.bizconnect.domain.product.service.ProductService;
 import com.springboot.bizconnect.domain.user.repository.UserRepository;
 import com.springboot.bizconnect.entity.Category;
+import com.springboot.bizconnect.entity.Company;
 import com.springboot.bizconnect.entity.Manufacturer;
 import com.springboot.bizconnect.entity.Product;
 import com.springboot.bizconnect.entity.ProductStatus;
@@ -38,6 +40,7 @@ import java.util.List;
 public class ProductServiceImpl implements ProductService {
     private final UserRepository userRepository;
     private final UnitRepository unitRepository;
+	private final CompanyRepository companyRepository;
     private final CategoryRepository categoryRepository;
     private final ManufacturerRepository manufacturerRepository;
     private final ProductStatusRepository productStatusRepository;
@@ -56,6 +59,9 @@ public class ProductServiceImpl implements ProductService {
         }
 
         // 이름으로 각 마스터 데이터 조회
+		Company company = companyRepository.findByName(requestDto.getCompanyName())
+				.orElseThrow(() -> new RuntimeException("존재하지 않는 회사입니다: " + requestDto.getUnit()));
+
         Unit unit = unitRepository.findByName(requestDto.getUnit())
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 단위입니다: " + requestDto.getUnit()));
 
@@ -70,6 +76,7 @@ public class ProductServiceImpl implements ProductService {
 
         // 상품 등록
         Product product = Product.builder()
+				.company(company)
                 .unit(unit)
                 .category(category)
                 .manufacturer(manufacturer)

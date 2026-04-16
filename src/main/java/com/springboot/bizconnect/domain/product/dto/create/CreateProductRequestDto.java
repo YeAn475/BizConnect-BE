@@ -16,6 +16,9 @@ public class CreateProductRequestDto {
     @Schema(description = "상품명", example = "테스트 상품")
     private String name;
 
+    @Schema(description = "회사명", example = "TestCompany")
+    private String companyName;
+
     @Schema(description = "단위명", example = "EA")
     private String unit;
 

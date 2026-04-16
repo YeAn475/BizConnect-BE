@@ -8,6 +8,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class AssignProductRequestDto {
-	private Long companyNo;
+	private Long buyerCompanyNo;
 	private List<Long> productNo;
 }

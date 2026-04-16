@@ -58,20 +58,20 @@ public class AdminCartController {
 	}
 	
 	
-	@GetMapping("/companies/{companyNo}")
+	@GetMapping("/companies/{buyerCompanyNo}")
     @Operation(summary = "특정 업체 배정 상품 조회", description = "관리자가 특정 업체의 장바구니를 조회합니다.")
     public ResponseEntity<List<CompanyProductListResponseDto>> getCompanyCart(
     		@AuthenticationPrincipal CustomUserDetails userDetails,
-		    @PathVariable Long companyNo,
+		    @PathVariable Long buyerCompanyNo,
 			@ParameterObject CompanyProductListRequestDto requestDto
 	) {
 		// 해당 업체에 존재하는 상품일것
         // 해당 상품의 is_used가 true인 값들 모두 조회
-		List<CompanyProductListResponseDto> responseDto = admincartservice.getCompanyCart(userDetails, companyNo, requestDto);
+		List<CompanyProductListResponseDto> responseDto = admincartservice.getCompanyCart(userDetails, buyerCompanyNo, requestDto);
         return ResponseEntity.ok(responseDto);
     }
 	
-	@PatchMapping("/{productNo}/update")
+	@PatchMapping("/update")
 	@Operation(summary = "거래처 상품 사용 여부 변경", description = "운영 관리자가 거래처 장바구니에 상품의 사용 여부를 변경합니다.")
 	public ResponseEntity<UpdateCartProductResponseDto> UpdateCompanyProductCart(
 			@AuthenticationPrincipal CustomUserDetails userDetails,

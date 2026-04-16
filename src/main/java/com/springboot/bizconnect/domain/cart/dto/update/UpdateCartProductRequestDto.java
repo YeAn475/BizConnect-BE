@@ -8,6 +8,6 @@ import java.util.List;
 @Getter
 @Setter
 public class UpdateCartProductRequestDto {
-    private Long companyNo;
+    private Long buyerCompanyNo;
     private List<Long> productNos;
 }
