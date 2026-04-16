@@ -36,8 +36,12 @@ public class Order extends BaseEntity {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_no", nullable = false)
-    private Company company;
+    @JoinColumn(name = "supplier_company_no", nullable = false)
+    private Company supplierCompany;  // 주문 받는 회사 (공급사)
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "buyer_company_no", nullable = false)
+    private Company buyerCompany;  // 주문 넣는 회사 (구매사)
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status",nullable = false)

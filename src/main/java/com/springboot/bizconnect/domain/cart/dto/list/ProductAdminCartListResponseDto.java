@@ -10,6 +10,6 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 public class ProductAdminCartListResponseDto {
-	private Long companyNo;
-    private String companyName;
+    private Long buyerCompanyNo;
+    private String buyerCompanyName;
 }

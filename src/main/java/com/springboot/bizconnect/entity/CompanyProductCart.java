@@ -28,11 +28,16 @@ import java.io.Serializable;
 public class CompanyProductCart extends BaseEntity {
     @EmbeddedId
     private CompanyProductNo no;
-    
+
     @OneToOne(fetch = FetchType.LAZY)
-    @MapsId("companyNo")
-    @JoinColumn(name = "company_no")
-    private Company company;
+    @MapsId("supplierCompanyNo")
+    @JoinColumn(name = "supplier_company_no")
+    private Company supplierCompany;  // 공급사
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId("buyerCompanyNo")
+    @JoinColumn(name = "buyer_company_no")
+    private Company buyerCompany;  // 구매사
     
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId("productNo")
@@ -48,8 +53,11 @@ public class CompanyProductCart extends BaseEntity {
     @AllArgsConstructor
     @EqualsAndHashCode // 복합키 비교를 위한 어노테이
     public static class CompanyProductNo implements Serializable {
-        @Column(name = "company_no", nullable = false)
-        private Long companyNo;
+        @Column(name = "supplier_company_no", nullable = false)
+        private Long supplierCompanyNo;
+
+        @Column(name = "buyer_company_no", nullable = false)
+        private Long buyerCompanyNo;
 
         @Column(name = "product_no", nullable = false)
         private Long productNo;

@@ -2,6 +2,8 @@ package com.springboot.bizconnect.domain.cart.service;
 
 import java.util.List;
 
+import com.springboot.bizconnect.domain.cart.dto.list.SupplierListRequestDto;
+import com.springboot.bizconnect.domain.cart.dto.list.SupplierListResponseDto;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
@@ -12,8 +14,7 @@ import com.springboot.bizconnect.domain.product.dto.list.ProductListRequestDto;
 import com.springboot.bizconnect.domain.product.dto.list.ProductListResponseDto;
 
 public interface CartService {
-	List<ProductListResponseDto> getCartProductList(@AuthenticationPrincipal CustomUserDetails userDetails, @ParameterObject ProductListRequestDto requestDto);
-	
-	CompanyProductDetailResponseDto getCartProductDetail(@ParameterObject CompanyProductDetailRequestDto requestDto, @AuthenticationPrincipal CustomUserDetails userDetails);
-
+	List<SupplierListResponseDto> getSupplierList(CustomUserDetails userDetails, SupplierListRequestDto requestDto);
+	List<ProductListResponseDto> getCartProductList(CustomUserDetails userDetails, Long supplierCompanyNo, ProductListRequestDto requestDto);
+	CompanyProductDetailResponseDto getCartProductDetail(CustomUserDetails userDetails, Long supplierCompanyNo, Long productNo);
 }

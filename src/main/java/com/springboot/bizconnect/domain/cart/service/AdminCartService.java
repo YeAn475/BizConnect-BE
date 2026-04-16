@@ -19,6 +19,6 @@ import com.springboot.bizconnect.domain.cart.dto.list.ProductAdminCartListRespon
 public interface AdminCartService {
 	AssignProductResponseDto assignProduct(@AuthenticationPrincipal CustomUserDetails userDetails,@ParameterObject AssignProductRequestDto requestDto);
 	List<ProductAdminCartListResponseDto> getCompanyCartList(@AuthenticationPrincipal CustomUserDetails userDetails,@ParameterObject ProductAdminCartListRequestDto requestDto);
-	List<CompanyProductListResponseDto> getCompanyCart(@AuthenticationPrincipal CustomUserDetails userDetails, Long companyNo, @ParameterObject CompanyProductListRequestDto requestDto);
+	List<CompanyProductListResponseDto> getCompanyCart(CustomUserDetails userDetails, Long buyerCompanyNo, CompanyProductListRequestDto requestDto);
 	UpdateCartProductResponseDto UpdateCompanyProductCart(@AuthenticationPrincipal CustomUserDetails userDetails, @ParameterObject UpdateCartProductRequestDto requestDto);
 }
