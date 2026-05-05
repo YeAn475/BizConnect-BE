@@ -196,7 +196,39 @@ public class BuyerOrderServiceImpl implements BuyerOrderService {
 
     @Override
     public BuyerOrderCancelResponseDto orderCancel(CustomUserDetails userDetails, BuyerOrderCancelRequestDto requestDto) {
-        return null;
+        User user = userRepository.findById(userDetails.getUser().getUserNo())
+                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
+
+        Order order = orderRepository.findById(requestDto.getOrderNo())
+                .orElseThrow(() -> new RuntimeException("주문을 찾을 수 없습니다."));
+
+        // 본인 회사 주문인지 확인
+        if (!order.getBuyerCompany().getCompanyNo().equals(user.getCompany().getCompanyNo())) {
+            return new BuyerOrderCancelResponseDto("다시한번 확인하세요");
+        }
+
+        // 이미 취소된 주문인지 확인
+        if (order.getStatus() == orderStatus.CLOSED) {
+            return new BuyerOrderCancelResponseDto("이미 취소된 주문입니다.");
+        }
+
+        // 상태 변경
+        order.setStatus(orderStatus.CLOSED);
+        orderRepository.save(order);
+
+        // 공급사에 알람 전송
+        String alarmTitle = "발주 취소 알림";
+        String alarmContent = user.getCompany().getName() + "에서 주문번호 " + order.getOrderNo() + "번 발주를 취소하였습니다.";
+
+        alarmService.sendToCompanyMembers(
+                user,
+                order.getSupplierCompany().getCompanyNo(),
+                alarmTitle,
+                alarmContent,
+                AlarmType.GENERAL
+        );
+
+        return new BuyerOrderCancelResponseDto("발주취소가 완료되었습니다.");
     }
 
     @Override
