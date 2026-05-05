@@ -181,7 +181,17 @@ public class BuyerOrderServiceImpl implements BuyerOrderService {
 
     @Override
     public BuyerOrderStatusResponseDto orderStatusDetail(CustomUserDetails userDetails, BuyerOrderStatusRequestDto requestDto) {
-        return null;
+        Order order = orderRepository.findById(requestDto.getOrderNo())
+                .orElseThrow(() -> new RuntimeException("주문을 찾을 수 없습니다."));
+        User user = userRepository.findById(userDetails.getUser().getUserNo())
+                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
+        if (!order.getBuyerCompany().getCompanyNo().equals(user.getCompany().getCompanyNo())) {
+            throw new RuntimeException("조회 권한이 없습니다.");
+        }
+
+        return BuyerOrderStatusResponseDto.builder()
+                .status(order.getStatus().name())
+                .build();
     }
 
     @Override
@@ -191,6 +201,10 @@ public class BuyerOrderServiceImpl implements BuyerOrderService {
 
     @Override
     public BuyerOrderUpdateResponseDto orderUpdate(CustomUserDetails userDetails, BuyerOrderUpdateRequestDto requestDto) {
+        /*
+           - 주문이 실제 있는지, 주문한 회사소속이 맞는지. 상품번호가 맞는지 확인
+           - 리스트 형태로 orderNo로 비교해서 존재하면 변경
+         */
         return null;
     }
 }

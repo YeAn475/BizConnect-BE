@@ -102,7 +102,7 @@ public class BuyerOrderController {
     }
 
     @PutMapping("/{orderNo}/cancel")
-    @Operation(summary = "주문 취소", description = "내가 넣은 주문을 취소합니다.")
+    @Operation(summary = "주문 취소", description = "내가 넣은 주문을 취소합니다.") // status => close
     public ResponseEntity<BuyerOrderCancelResponseDto> orderCancel(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @ParameterObject BuyerOrderCancelRequestDto requestDto
