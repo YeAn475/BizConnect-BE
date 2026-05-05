@@ -1,36 +1,48 @@
 package com.springboot.bizconnect.domain.order.service.impl;
 
+import com.springboot.bizconnect.entity.User;
+import com.springboot.bizconnect.entity.Order;
+import com.springboot.bizconnect.entity.Company;
+import com.springboot.bizconnect.entity.Product;
+import com.springboot.bizconnect.entity.OrderItem;
+import com.springboot.bizconnect.entity.CompanyProductCart;
+
+import com.springboot.bizconnect.enums.AlarmType;
+import com.springboot.bizconnect.enums.orderStatus;
+
 import com.springboot.bizconnect.domain.alarm.service.AlarmService;
+
 import com.springboot.bizconnect.domain.auth.CustomUserDetails;
-import com.springboot.bizconnect.domain.cart.repository.CompanyProductCartRepository;
+import com.springboot.bizconnect.domain.user.repository.UserRepository;
+import com.springboot.bizconnect.domain.order.service.BuyerOrderService;
+import com.springboot.bizconnect.domain.order.repository.OrderRepository;
 import com.springboot.bizconnect.domain.cart.repository.OrderItemRepository;
 import com.springboot.bizconnect.domain.company.repository.CompanyRepository;
 import com.springboot.bizconnect.domain.order.dto.create.CreateOrderRequestDto;
 import com.springboot.bizconnect.domain.order.dto.create.CreateOrderResponseDto;
-import com.springboot.bizconnect.domain.order.repository.OrderRepository;
-import com.springboot.bizconnect.domain.order.service.BuyerOrderService;
-import com.springboot.bizconnect.entity.Company;
-import com.springboot.bizconnect.entity.CompanyProductCart;
-import com.springboot.bizconnect.entity.Order;
-import com.springboot.bizconnect.entity.OrderItem;
-import com.springboot.bizconnect.entity.Product;
-import com.springboot.bizconnect.enums.AlarmType;
-import com.springboot.bizconnect.enums.orderStatus;
+import com.springboot.bizconnect.domain.order.dto.list.BuyerOrderListRequestDto;
+import com.springboot.bizconnect.domain.order.dto.list.BuyerOrderListResponseDto;
+import com.springboot.bizconnect.domain.cart.repository.CompanyProductCartRepository;
+
 import lombok.RequiredArgsConstructor;
+
+
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
 public class BuyerOrderServiceImpl implements BuyerOrderService {
-    private final CompanyRepository companyRepository;
-    private final OrderRepository orderRepository;
-    private final CompanyProductCartRepository companyProductCartRepository;
-    private final OrderItemRepository orderItemRepository;
     private final AlarmService alarmService;
+    private final UserRepository userRepository;
+    private final OrderRepository orderRepository;
+    private final CompanyRepository companyRepository;
+    private final OrderItemRepository orderItemRepository;
+    private final CompanyProductCartRepository companyProductCartRepository;
 
     @Override
     @Transactional
@@ -38,14 +50,14 @@ public class BuyerOrderServiceImpl implements BuyerOrderService {
         Long buyerCompanyNo = userDetails.getUser().getCompany().getCompanyNo();
         Long supplierCompanyNo = requestDto.getSupplierCompanyNo();
 
-        // 1. 공급사 존재 확인
+        // 공급사 존재 확인
         Company supplierCompany = companyRepository.findById(supplierCompanyNo)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 공급사입니다."));
 
         Company buyerCompany = companyRepository.findById(buyerCompanyNo)
                 .orElseThrow(() -> new RuntimeException("구매사 정보를 찾을 수 없습니다."));
 
-        // 2. 주문 생성
+        // 주문 생성
         Order order = Order.builder()
                 .supplierCompany(supplierCompany)
                 .buyerCompany(buyerCompany)
@@ -55,7 +67,7 @@ public class BuyerOrderServiceImpl implements BuyerOrderService {
 
         orderRepository.save(order);
 
-        // 3. 주문 상품 검증 및 저장
+        // 주문 상품 검증 및 저장
         List<String> orderedProductNames = new ArrayList<>();
 
         for (CreateOrderRequestDto.OrderItemDto item : requestDto.getOrderItems()) {
@@ -102,5 +114,28 @@ public class BuyerOrderServiceImpl implements BuyerOrderService {
                 .orderNo(order.getOrderNo())
                 .message(orderedProductNames.size() + "개 상품 주문이 완료되었습니다.")
                 .build();
+    }
+
+    @Override
+    public List<BuyerOrderListResponseDto> OrderList(CustomUserDetails userDetails, BuyerOrderListRequestDto requestDto) {
+        User user = userRepository.findById(userDetails.getUser().getUserNo())
+                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
+
+        Company buyerCompany = user.getCompany();
+        if (buyerCompany == null) {
+            throw new RuntimeException("소속된 회사가 없습니다.");
+        }
+
+        PageRequest pageRequest = PageRequest.of(requestDto.getPage(), requestDto.getSize());
+
+        return orderRepository.findByBuyerCompany_CompanyNo(buyerCompany.getCompanyNo(), pageRequest)
+                .map(order -> BuyerOrderListResponseDto.builder()
+                        .orderNo(order.getOrderNo())
+                        .supplierCompanyName(order.getSupplierCompany().getName())
+                        .orderStatus(order.getStatus().name())
+                        .createdAt(order.getCreatedAt())
+                        .build())
+                .getContent();
+
     }
 }
