@@ -11,6 +11,6 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderCancelRequestDto {
+public class BuyerOrderCancelRequestDto {
     private Long orderNo;
 }

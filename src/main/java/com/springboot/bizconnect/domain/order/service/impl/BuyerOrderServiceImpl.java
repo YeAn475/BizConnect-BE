@@ -1,11 +1,13 @@
 package com.springboot.bizconnect.domain.order.service.impl;
 
-import com.springboot.bizconnect.domain.order.dto.cancel.OrderCancelRequestDto;
-import com.springboot.bizconnect.domain.order.dto.cancel.OrderCancelResponseDto;
+import com.springboot.bizconnect.domain.order.dto.cancel.BuyerOrderCancelRequestDto;
+import com.springboot.bizconnect.domain.order.dto.cancel.BuyerOrderCancelResponseDto;
 import com.springboot.bizconnect.domain.order.dto.detail.BuyerOrderDetailRequestDto;
 import com.springboot.bizconnect.domain.order.dto.detail.BuyerOrderDetailResponseDto;
 import com.springboot.bizconnect.domain.order.dto.status.BuyerOrderStatusRequestDto;
 import com.springboot.bizconnect.domain.order.dto.status.BuyerOrderStatusResponseDto;
+import com.springboot.bizconnect.domain.order.dto.update.BuyerOrderUpdateRequestDto;
+import com.springboot.bizconnect.domain.order.dto.update.BuyerOrderUpdateResponseDto;
 import com.springboot.bizconnect.entity.User;
 import com.springboot.bizconnect.entity.Order;
 import com.springboot.bizconnect.entity.Company;
@@ -156,7 +158,12 @@ public class BuyerOrderServiceImpl implements BuyerOrderService {
     }
 
     @Override
-    public OrderCancelResponseDto orderCancel(CustomUserDetails userDetails, OrderCancelRequestDto requestDto) {
+    public BuyerOrderCancelResponseDto orderCancel(CustomUserDetails userDetails, BuyerOrderCancelRequestDto requestDto) {
+        return null;
+    }
+
+    @Override
+    public BuyerOrderUpdateResponseDto orderUpdate(CustomUserDetails userDetails, BuyerOrderUpdateRequestDto requestDto) {
         return null;
     }
 }

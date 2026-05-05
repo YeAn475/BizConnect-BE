@@ -1,8 +1,8 @@
 package com.springboot.bizconnect.domain.order.controller;
 
 import com.springboot.bizconnect.domain.auth.CustomUserDetails;
-import com.springboot.bizconnect.domain.order.dto.cancel.OrderCancelRequestDto;
-import com.springboot.bizconnect.domain.order.dto.cancel.OrderCancelResponseDto;
+import com.springboot.bizconnect.domain.order.dto.cancel.BuyerOrderCancelRequestDto;
+import com.springboot.bizconnect.domain.order.dto.cancel.BuyerOrderCancelResponseDto;
 import com.springboot.bizconnect.domain.order.dto.create.CreateOrderRequestDto;
 import com.springboot.bizconnect.domain.order.dto.create.CreateOrderResponseDto;
 import com.springboot.bizconnect.domain.order.dto.detail.BuyerOrderDetailRequestDto;
@@ -11,6 +11,8 @@ import com.springboot.bizconnect.domain.order.dto.status.BuyerOrderStatusRequest
 import com.springboot.bizconnect.domain.order.dto.status.BuyerOrderStatusResponseDto;
 import com.springboot.bizconnect.domain.order.dto.list.BuyerOrderListRequestDto;
 import com.springboot.bizconnect.domain.order.dto.list.BuyerOrderListResponseDto;
+import com.springboot.bizconnect.domain.order.dto.update.BuyerOrderUpdateRequestDto;
+import com.springboot.bizconnect.domain.order.dto.update.BuyerOrderUpdateResponseDto;
 import com.springboot.bizconnect.domain.order.service.BuyerOrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -52,6 +54,8 @@ public class BuyerOrderController {
       param: page, size
 
       - 주문 이력 상세 보기
+
+      - 주문 수정
 
 
       주문 상태 보기 vs 주문 상세 보기
@@ -99,11 +103,21 @@ public class BuyerOrderController {
 
     @PutMapping("/{orderNo}/cancel")
     @Operation(summary = "주문 취소", description = "내가 넣은 주문을 취소합니다.")
-    public ResponseEntity<OrderCancelResponseDto> orderCancel(
+    public ResponseEntity<BuyerOrderCancelResponseDto> orderCancel(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @ParameterObject OrderCancelRequestDto requestDto
+            @ParameterObject BuyerOrderCancelRequestDto requestDto
     ) {
-        OrderCancelResponseDto responseDto = buyerOrderService.orderCancel(userDetails, requestDto);
+        BuyerOrderCancelResponseDto responseDto = buyerOrderService.orderCancel(userDetails, requestDto);
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @PutMapping("/{orderNo}/update")
+    @Operation(summary = "주문 수정", description = "내가 넣은 주문을 수정합니다.")
+    public ResponseEntity<BuyerOrderUpdateResponseDto> orderUpdate(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @ParameterObject BuyerOrderUpdateRequestDto requestDto
+    ) {
+        BuyerOrderUpdateResponseDto responseDto = buyerOrderService.orderUpdate(userDetails, requestDto);
         return ResponseEntity.ok(responseDto);
     }
 }
