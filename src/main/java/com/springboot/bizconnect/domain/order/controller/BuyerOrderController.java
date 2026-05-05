@@ -115,7 +115,7 @@ public class BuyerOrderController {
     @Operation(summary = "주문 수정", description = "내가 넣은 주문을 수정합니다.")
     public ResponseEntity<BuyerOrderUpdateResponseDto> orderUpdate(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @ParameterObject BuyerOrderUpdateRequestDto requestDto
+            @RequestBody BuyerOrderUpdateRequestDto requestDto
     ) {
         BuyerOrderUpdateResponseDto responseDto = buyerOrderService.orderUpdate(userDetails, requestDto);
         return ResponseEntity.ok(responseDto);

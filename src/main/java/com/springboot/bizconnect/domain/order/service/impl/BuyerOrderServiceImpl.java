@@ -232,11 +232,81 @@ public class BuyerOrderServiceImpl implements BuyerOrderService {
     }
 
     @Override
+    @Transactional
     public BuyerOrderUpdateResponseDto orderUpdate(CustomUserDetails userDetails, BuyerOrderUpdateRequestDto requestDto) {
-        /*
-           - 주문이 실제 있는지, 주문한 회사소속이 맞는지. 상품번호가 맞는지 확인
-           - 리스트 형태로 orderNo로 비교해서 존재하면 변경
-         */
-        return null;
+        User user = userRepository.findById(userDetails.getUser().getUserNo())
+                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
+
+        Order order = orderRepository.findById(requestDto.getOrderNo())
+                .orElseThrow(() -> new RuntimeException("주문을 찾을 수 없습니다."));
+
+        // 본인 회사 주문인지 확인
+        if (!order.getBuyerCompany().getCompanyNo().equals(user.getCompany().getCompanyNo())) {
+            throw new RuntimeException("수정 권한이 없습니다.");
+        }
+
+        // PENDING 상태일 때만 수정 가능
+        if (order.getStatus() != orderStatus.PENDING) {
+            throw new RuntimeException("대기 상태의 주문만 수정할 수 있습니다.");
+        }
+
+        List<String> updatedProductNames = new ArrayList<>();
+
+        for (BuyerOrderUpdateRequestDto.OrderItemDto item : requestDto.getOrderItems()) {
+            if (item.getQuantity() == null || item.getQuantity() < 1) {
+                throw new RuntimeException("수량은 1개 이상이어야 합니다.");
+            }
+
+            // 장바구니에 배정된 상품인지 확인
+            CompanyProductCart cart = companyProductCartRepository
+                    .findByNo_SupplierCompanyNoAndNo_BuyerCompanyNoAndNo_ProductNo(
+                            order.getSupplierCompany().getCompanyNo(),
+                            order.getBuyerCompany().getCompanyNo(),
+                            item.getProductNo())
+                    .orElseThrow(() -> new RuntimeException("배정되지 않은 상품입니다: " + item.getProductNo()));
+
+            if (!cart.getIsUsed()) {
+                throw new RuntimeException("현재 주문할 수 없는 상품입니다: " + item.getProductNo());
+            }
+
+            Product product = cart.getProduct();
+
+            // 기존 OrderItem 찾기
+            OrderItem existingItem = orderItemRepository
+                    .findByOrder_OrderNoAndProduct_ProductNo(order.getOrderNo(), item.getProductNo())
+                    .orElse(null);
+
+            if (existingItem != null) {
+                // 있으면 수량만 수정
+                existingItem.setQuantity(item.getQuantity());
+                orderItemRepository.save(existingItem);
+            } else {
+                // 없으면 새로 추가
+                OrderItem orderItem = OrderItem.builder()
+                        .order(order)
+                        .product(product)
+                        .quantity(item.getQuantity())
+                        .build();
+                orderItemRepository.save(orderItem);
+            }
+
+            updatedProductNames.add(product.getName());
+        }
+
+        // 공급사에 알람 전송
+        String alarmTitle = "발주 수정 알림";
+        String alarmContent = user.getCompany().getName() + "에서 주문번호 " + order.getOrderNo() + "번 발주를 수정하였습니다.";
+
+        alarmService.sendToCompanyMembers(
+                user,
+                order.getSupplierCompany().getCompanyNo(),
+                alarmTitle,
+                alarmContent,
+                AlarmType.GENERAL
+        );
+
+        return BuyerOrderUpdateResponseDto.builder()
+                .message(updatedProductNames.size() + "개 상품 주문이 수정되었습니다.")
+                .build();
     }
 }
