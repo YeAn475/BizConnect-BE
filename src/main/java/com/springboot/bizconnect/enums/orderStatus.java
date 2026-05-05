@@ -1,5 +1,5 @@
 package com.springboot.bizconnect.enums;
 
 public enum orderStatus {
-    ACTIVE, ANSWERED,CLOSED
+    PENDING, ANSWERED, CLOSED
 }

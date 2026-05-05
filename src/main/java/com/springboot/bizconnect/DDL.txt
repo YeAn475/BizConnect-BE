@@ -1,0 +1,612 @@
+create table bizconnect.affiliation
+(
+    affiliation_no int auto_increment
+        primary key,
+    name           varchar(40) not null
+)
+    collate = utf8mb4_uca1400_ai_ci;
+
+create table bizconnect.branch
+(
+    branch_no int auto_increment
+        primary key,
+    name      varchar(40) not null
+)
+    collate = utf8mb4_uca1400_ai_ci;
+
+create table bizconnect.business_registration
+(
+    business_registration_no int auto_increment
+        primary key,
+    number                   varchar(255)                         not null,
+    created_at               datetime default current_timestamp() not null,
+    updated_at               datetime default current_timestamp() not null on update current_timestamp()
+)
+    collate = utf8mb4_uca1400_ai_ci;
+
+create table bizconnect.category
+(
+    category_no int auto_increment
+        primary key,
+    name        varchar(100) not null
+)
+    collate = utf8mb4_uca1400_ai_ci;
+
+create table bizconnect.chatroom
+(
+    chatroom_no int auto_increment
+        primary key,
+    name        varchar(255)                                                    not null,
+    created_at  datetime                            default current_timestamp() not null,
+    status      enum ('ACTIVE', 'CLOSE', 'DELETED') default 'ACTIVE'            not null
+)
+    collate = utf8mb4_uca1400_ai_ci;
+
+create table bizconnect.company
+(
+    company_no     int auto_increment
+        primary key,
+    affiliation_no int                                    not null,
+    branch_no      int                                    not null,
+    phone_number   varchar(30)                            not null,
+    address        varchar(100)                           not null,
+    created_at     datetime   default current_timestamp() not null,
+    updated_at     datetime   default current_timestamp() not null on update current_timestamp(),
+    is_deleted     tinyint(1) default 0                   not null,
+    name           varchar(100)                           null,
+    constraint FK_company_affiliation
+        foreign key (affiliation_no) references bizconnect.affiliation (affiliation_no)
+            on update cascade,
+    constraint FK_company_branch
+        foreign key (branch_no) references bizconnect.branch (branch_no)
+            on update cascade
+)
+    collate = utf8mb4_uca1400_ai_ci;
+
+create index idx_company_affiliation
+    on bizconnect.company (affiliation_no);
+
+create index idx_company_branch
+    on bizconnect.company (branch_no);
+
+create table bizconnect.company_join_request
+(
+    company_join_request_no int auto_increment
+        primary key,
+    user_no                 int                                                        not null,
+    company_no              int                                                        not null,
+    status                  enum ('PENDING', 'APPROVED', 'REJECTED') default 'PENDING' null,
+    created_at              datetime                                                   null,
+    updated_at              datetime                                                   null
+);
+
+create table bizconnect.company_product_cart_backup
+(
+    company_no int                                    not null,
+    product_no int                                    not null,
+    is_used    tinyint(1) default 1                   not null,
+    created_at datetime   default current_timestamp() not null,
+    updated_at datetime   default current_timestamp() not null on update current_timestamp()
+);
+
+create table bizconnect.company_request
+(
+    company_request_no int auto_increment
+        primary key,
+    branch_name        varchar(40)                                                          null,
+    user_no            int                                                                  not null,
+    phone_number       varchar(30)                                                          null,
+    address            varchar(100)                                                         null,
+    status             enum ('PENDING', 'APPROVED', 'REJECTED') default 'PENDING'           null,
+    created_at         datetime                                 default current_timestamp() null,
+    updated_at         datetime                                 default current_timestamp() null on update current_timestamp(),
+    affiliation_name   varchar(40)                                                          null,
+    name               varchar(100)                                                         not null
+);
+
+create table bizconnect.corporate_account
+(
+    corporate_account_no int auto_increment
+        primary key,
+    number               varchar(255)                         not null,
+    created_at           datetime default current_timestamp() not null,
+    updated_at           datetime default current_timestamp() not null
+)
+    collate = utf8mb4_uca1400_ai_ci;
+
+create table bizconnect.account
+(
+    company_no           int not null,
+    corporate_account_no int not null,
+    primary key (company_no, corporate_account_no),
+    constraint FK_account_company
+        foreign key (company_no) references bizconnect.company (company_no)
+            on update cascade on delete cascade,
+    constraint FK_account_corporate
+        foreign key (corporate_account_no) references bizconnect.corporate_account (corporate_account_no)
+            on update cascade on delete cascade
+)
+    collate = utf8mb4_uca1400_ai_ci;
+
+create index idx_account_company
+    on bizconnect.account (company_no);
+
+create index idx_account_corporate
+    on bizconnect.account (corporate_account_no);
+
+create table bizconnect.inquiry_category
+(
+    inquiry_category_no int auto_increment
+        primary key,
+    name                varchar(50) not null
+)
+    collate = utf8mb4_uca1400_ai_ci;
+
+create table bizconnect.manufacturer
+(
+    manufacturer_no int auto_increment
+        primary key,
+    name            varchar(255) not null
+)
+    collate = utf8mb4_uca1400_ai_ci;
+
+create table bizconnect.position
+(
+    position_no int auto_increment
+        primary key,
+    name        varchar(10) not null
+)
+    collate = utf8mb4_uca1400_ai_ci;
+
+create table bizconnect.product_status
+(
+    product_status_no int auto_increment
+        primary key,
+    name              varchar(100) not null
+)
+    collate = utf8mb4_uca1400_ai_ci;
+
+create table bizconnect.registration
+(
+    company_no               int not null,
+    business_registration_no int not null,
+    primary key (company_no, business_registration_no),
+    constraint FK_registration_business
+        foreign key (business_registration_no) references bizconnect.business_registration (business_registration_no)
+            on update cascade on delete cascade,
+    constraint FK_registration_company
+        foreign key (company_no) references bizconnect.company (company_no)
+            on update cascade on delete cascade
+)
+    collate = utf8mb4_uca1400_ai_ci;
+
+create index idx_registration_business
+    on bizconnect.registration (business_registration_no);
+
+create index idx_registration_company
+    on bizconnect.registration (company_no);
+
+create table bizconnect.role
+(
+    role_no int auto_increment
+        primary key,
+    name    varchar(20) not null
+)
+    collate = utf8mb4_uca1400_ai_ci;
+
+create table bizconnect.unit
+(
+    unit_no int auto_increment
+        primary key,
+    name    varchar(100) not null
+)
+    collate = utf8mb4_uca1400_ai_ci;
+
+create table bizconnect.product
+(
+    product_no        int auto_increment
+        primary key,
+    unit_no           int                                  not null,
+    category_no       int                                  not null,
+    manufacturer_no   int                                  not null,
+    product_status_no int                                  not null,
+    company_no        int                                  not null,
+    name              varchar(50)                          not null,
+    content           text                                 null,
+    price             double                               not null,
+    image_url         varchar(255)                         null,
+    created_at        datetime default current_timestamp() not null,
+    updated_at        datetime default current_timestamp() not null on update current_timestamp(),
+    constraint FK_product_category
+        foreign key (category_no) references bizconnect.category (category_no)
+            on update cascade,
+    constraint FK_product_company
+        foreign key (company_no) references bizconnect.company (company_no)
+            on update cascade,
+    constraint FK_product_manufacturer
+        foreign key (manufacturer_no) references bizconnect.manufacturer (manufacturer_no)
+            on update cascade,
+    constraint FK_product_status
+        foreign key (product_status_no) references bizconnect.product_status (product_status_no)
+            on update cascade,
+    constraint FK_product_unit
+        foreign key (unit_no) references bizconnect.unit (unit_no)
+            on update cascade
+)
+    collate = utf8mb4_uca1400_ai_ci;
+
+create table bizconnect.company_product_cart
+(
+    supplier_company_no int                                    not null,
+    buyer_company_no    int                                    not null,
+    product_no          int                                    not null,
+    is_used             tinyint(1) default 1                   not null,
+    created_at          datetime   default current_timestamp() not null,
+    updated_at          datetime   default current_timestamp() not null on update current_timestamp(),
+    primary key (supplier_company_no, buyer_company_no, product_no),
+    constraint FK_cpc_buyer_company
+        foreign key (buyer_company_no) references bizconnect.company (company_no)
+            on update cascade on delete cascade,
+    constraint FK_cpc_product
+        foreign key (product_no) references bizconnect.product (product_no)
+            on update cascade on delete cascade,
+    constraint FK_cpc_supplier_company
+        foreign key (supplier_company_no) references bizconnect.company (company_no)
+            on update cascade on delete cascade
+)
+    collate = utf8mb4_uca1400_ai_ci;
+
+create index idx_cpc_buyer
+    on bizconnect.company_product_cart (buyer_company_no);
+
+create index idx_cpc_product
+    on bizconnect.company_product_cart (product_no);
+
+create index idx_cpc_supplier
+    on bizconnect.company_product_cart (supplier_company_no);
+
+create index idx_product_category
+    on bizconnect.product (category_no);
+
+create index idx_product_company
+    on bizconnect.product (company_no);
+
+create index idx_product_manufacturer
+    on bizconnect.product (manufacturer_no);
+
+create index idx_product_status
+    on bizconnect.product (product_status_no);
+
+create index idx_product_unit
+    on bizconnect.product (unit_no);
+
+create table bizconnect.user_status
+(
+    user_status_no int auto_increment
+        primary key,
+    name           varchar(20) not null
+)
+    collate = utf8mb4_uca1400_ai_ci;
+
+create table bizconnect.user
+(
+    user_no        int auto_increment
+        primary key,
+    role_no        int                                    not null,
+    position_no    int                                    not null,
+    user_status_no int                                    not null,
+    company_no     int                                    not null,
+    name           varchar(20)                            not null,
+    email          varchar(50)                            not null,
+    password       varchar(255)                           not null,
+    phone_number   varchar(30)                            not null,
+    address        varchar(100)                           not null,
+    created_at     datetime   default current_timestamp() not null,
+    updated_at     datetime   default current_timestamp() not null on update current_timestamp(),
+    is_deleted     tinyint(1) default 0                   not null,
+    image_url      varchar(255)                           null,
+    is_open        tinyint(1) default 1                   not null,
+    constraint FK_user_company
+        foreign key (company_no) references bizconnect.company (company_no)
+            on update cascade,
+    constraint FK_user_position
+        foreign key (position_no) references bizconnect.position (position_no)
+            on update cascade,
+    constraint FK_user_role
+        foreign key (role_no) references bizconnect.role (role_no)
+            on update cascade,
+    constraint FK_user_status
+        foreign key (user_status_no) references bizconnect.user_status (user_status_no)
+            on update cascade
+)
+    collate = utf8mb4_uca1400_ai_ci;
+
+create table bizconnect.alarm
+(
+    alarm_no       int auto_increment
+        primary key,
+    title          varchar(255)                         not null,
+    content        text                                 not null,
+    created_at     datetime default current_timestamp() not null,
+    sender_user_no int                                  null,
+    alarm_type     varchar(50)                          not null,
+    reference_no   bigint                               null,
+    constraint FK_alarm_sender_user
+        foreign key (sender_user_no) references bizconnect.user (user_no)
+            on update cascade on delete set null
+)
+    collate = utf8mb4_uca1400_ai_ci;
+
+create index idx_alarm_reference
+    on bizconnect.alarm (alarm_type, reference_no);
+
+create index idx_alarm_sender_user
+    on bizconnect.alarm (sender_user_no);
+
+create index idx_alarm_type
+    on bizconnect.alarm (alarm_type);
+
+create table bizconnect.chat_join
+(
+    user_no              int           not null,
+    chatroom_no          int           not null,
+    last_read_message_no int default 0 not null,
+    primary key (user_no, chatroom_no),
+    constraint FK_chat_join_chatroom
+        foreign key (chatroom_no) references bizconnect.chatroom (chatroom_no)
+            on update cascade on delete cascade,
+    constraint FK_chat_join_user
+        foreign key (user_no) references bizconnect.user (user_no)
+            on update cascade on delete cascade
+)
+    collate = utf8mb4_uca1400_ai_ci;
+
+create index idx_chat_join_chatroom
+    on bizconnect.chat_join (chatroom_no);
+
+create index idx_chat_join_user
+    on bizconnect.chat_join (user_no);
+
+create table bizconnect.friend_request
+(
+    friend_request_no int auto_increment
+        primary key,
+    sender_user_no    int                                                                  not null,
+    receiver_user_no  int                                                                  not null,
+    status            enum ('PENDING', 'ACCEPTED', 'REJECTED') default 'PENDING'           not null,
+    created_at        datetime                                 default current_timestamp() not null,
+    updated_at        datetime                                 default current_timestamp() not null on update current_timestamp(),
+    constraint FK_friend_request_receiver
+        foreign key (receiver_user_no) references bizconnect.user (user_no)
+            on update cascade on delete cascade,
+    constraint FK_friend_request_sender
+        foreign key (sender_user_no) references bizconnect.user (user_no)
+            on update cascade on delete cascade
+)
+    collate = utf8mb4_uca1400_ai_ci;
+
+create index idx_fr_receiver
+    on bizconnect.friend_request (receiver_user_no);
+
+create index idx_fr_sender
+    on bizconnect.friend_request (sender_user_no);
+
+create table bizconnect.friendship
+(
+    friendship_no int auto_increment
+        primary key,
+    user_no       int                                  not null,
+    friend_no     int                                  not null,
+    created_at    datetime default current_timestamp() not null,
+    constraint FK_friendship_user1
+        foreign key (user_no) references bizconnect.user (user_no)
+            on update cascade on delete cascade,
+    constraint FK_friendship_user2
+        foreign key (friend_no) references bizconnect.user (user_no)
+            on update cascade on delete cascade
+)
+    collate = utf8mb4_uca1400_ai_ci;
+
+create index idx_friendship_user1
+    on bizconnect.friendship (user_no);
+
+create index idx_friendship_user2
+    on bizconnect.friendship (friend_no);
+
+create table bizconnect.inquiry
+(
+    inquiry_no          int auto_increment
+        primary key,
+    company_no          int                                                                not null,
+    user_no             int                                                                not null,
+    inquiry_category_no int                                                                not null,
+    title               varchar(255)                                                       not null,
+    content             text                                                               not null,
+    status              enum ('PENDING', 'ANSWERED', 'CLOSED') default 'PENDING'           not null,
+    created_at          datetime                               default current_timestamp() not null,
+    updated_at          datetime                               default current_timestamp() not null on update current_timestamp(),
+    constraint FK_inquiry_category
+        foreign key (inquiry_category_no) references bizconnect.inquiry_category (inquiry_category_no)
+            on update cascade,
+    constraint FK_inquiry_company
+        foreign key (company_no) references bizconnect.company (company_no)
+            on update cascade on delete cascade,
+    constraint FK_inquiry_user
+        foreign key (user_no) references bizconnect.user (user_no)
+            on update cascade on delete cascade
+)
+    collate = utf8mb4_uca1400_ai_ci;
+
+create index idx_inquiry_category
+    on bizconnect.inquiry (inquiry_category_no);
+
+create index idx_inquiry_company
+    on bizconnect.inquiry (company_no);
+
+create index idx_inquiry_user
+    on bizconnect.inquiry (user_no);
+
+create table bizconnect.inquiry_attachment
+(
+    inquiry_attachment_no int auto_increment
+        primary key,
+    inquiry_no            int                                  not null,
+    file_url              varchar(255)                         not null,
+    created_at            datetime default current_timestamp() not null,
+    constraint FK_attachment_inquiry
+        foreign key (inquiry_no) references bizconnect.inquiry (inquiry_no)
+            on update cascade on delete cascade
+)
+    collate = utf8mb4_uca1400_ai_ci;
+
+create index idx_attachment_inquiry
+    on bizconnect.inquiry_attachment (inquiry_no);
+
+create table bizconnect.message
+(
+    message_no  int auto_increment
+        primary key,
+    user_no     int                                  not null,
+    chatroom_no int                                  not null,
+    content     text                                 not null,
+    created_at  datetime default current_timestamp() not null,
+    constraint FK_message_chatroom
+        foreign key (chatroom_no) references bizconnect.chatroom (chatroom_no)
+            on update cascade on delete cascade,
+    constraint FK_message_user
+        foreign key (user_no) references bizconnect.user (user_no)
+            on update cascade on delete cascade
+)
+    collate = utf8mb4_uca1400_ai_ci;
+
+create index idx_message_chatroom
+    on bizconnect.message (chatroom_no);
+
+create index idx_message_user
+    on bizconnect.message (user_no);
+
+create table bizconnect.notice
+(
+    notice_no  int auto_increment
+        primary key,
+    user_no    int                                    not null,
+    title      varchar(255)                           not null,
+    content    text                                   not null,
+    view_count int        default 0                   not null,
+    created_at datetime   default current_timestamp() not null,
+    updated_at datetime   default current_timestamp() not null on update current_timestamp(),
+    is_deleted tinyint(1) default 0                   not null,
+    constraint FK_notice_user
+        foreign key (user_no) references bizconnect.user (user_no)
+            on update cascade on delete cascade
+)
+    collate = utf8mb4_uca1400_ai_ci;
+
+create index idx_notice_user
+    on bizconnect.notice (user_no);
+
+create table bizconnect.`order`
+(
+    order_no            int auto_increment
+        primary key,
+    user_no             int                                                                not null,
+    supplier_company_no int                                                                not null,
+    buyer_company_no    int                                                                not null,
+    status              enum ('PENDING', 'ANSWERED', 'CLOSED') default 'PENDING'           not null,
+    created_at          datetime                               default current_timestamp() not null,
+    updated_at          datetime                               default current_timestamp() not null on update current_timestamp(),
+    constraint FK_order_buyer_company
+        foreign key (buyer_company_no) references bizconnect.company (company_no)
+            on update cascade on delete cascade,
+    constraint FK_order_supplier_company
+        foreign key (supplier_company_no) references bizconnect.company (company_no)
+            on update cascade on delete cascade,
+    constraint FK_order_user
+        foreign key (user_no) references bizconnect.user (user_no)
+            on update cascade on delete cascade
+)
+    collate = utf8mb4_uca1400_ai_ci;
+
+create index idx_order_buyer
+    on bizconnect.`order` (buyer_company_no);
+
+create index idx_order_supplier
+    on bizconnect.`order` (supplier_company_no);
+
+create index idx_order_user
+    on bizconnect.`order` (user_no);
+
+create table bizconnect.order_item
+(
+    order_item_no int auto_increment
+        primary key,
+    order_no      int not null,
+    product_no    int not null,
+    quantity      int not null,
+    constraint FK_order_item_order
+        foreign key (order_no) references bizconnect.`order` (order_no)
+            on update cascade on delete cascade,
+    constraint FK_order_item_product
+        foreign key (product_no) references bizconnect.product (product_no)
+            on update cascade
+)
+    collate = utf8mb4_uca1400_ai_ci;
+
+create index idx_order_item_order
+    on bizconnect.order_item (order_no);
+
+create index idx_order_item_product
+    on bizconnect.order_item (product_no);
+
+create table bizconnect.schedule
+(
+    schedule_no int auto_increment
+        primary key,
+    company_no  int                                    not null,
+    user_no     int                                    not null,
+    title       varchar(255)                           not null,
+    content     text                                   not null,
+    started_at  datetime                               not null,
+    ended_at    datetime                               not null,
+    created_at  datetime   default current_timestamp() not null,
+    updated_at  datetime   default current_timestamp() not null on update current_timestamp(),
+    is_deleted  tinyint(1) default 0                   not null,
+    constraint FK_schedule_company
+        foreign key (company_no) references bizconnect.company (company_no)
+            on update cascade on delete cascade,
+    constraint FK_schedule_user
+        foreign key (user_no) references bizconnect.user (user_no)
+            on update cascade on delete cascade
+)
+    collate = utf8mb4_uca1400_ai_ci;
+
+create index idx_schedule_company
+    on bizconnect.schedule (company_no);
+
+create index idx_schedule_user
+    on bizconnect.schedule (user_no);
+
+create index idx_user_company
+    on bizconnect.user (company_no);
+
+create index idx_user_position
+    on bizconnect.user (position_no);
+
+create index idx_user_role
+    on bizconnect.user (role_no);
+
+create index idx_user_status
+    on bizconnect.user (user_status_no);
+
+create table bizconnect.user_alarm
+(
+    user_no    int                  not null,
+    alarm_no   int                  not null,
+    is_read    tinyint(1) default 0 not null,
+    is_deleted tinyint(1) default 0 not null,
+    primary key (user_no, alarm_no),
+    constraint FK_user_alarm_alarm
+        foreign key (alarm_no) references bizconnect.alarm (alarm_no),
+    constraint FK_user_alarm_user
+        foreign key (user_no) references bizconnect.user (user_no)
+);

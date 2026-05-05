@@ -9,13 +9,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.springboot.bizconnect.domain.auth.CustomUserDetails;
-import com.springboot.bizconnect.domain.cart.dto.detail.CompanyProductDetailRequestDto;
 import com.springboot.bizconnect.domain.cart.dto.detail.CompanyProductDetailResponseDto;
 import com.springboot.bizconnect.domain.cart.repository.CompanyProductCartRepository;
 import com.springboot.bizconnect.domain.cart.service.CartService;
 import com.springboot.bizconnect.domain.product.dto.list.ProductListRequestDto;
 import com.springboot.bizconnect.domain.product.dto.list.ProductListResponseDto;
-import com.springboot.bizconnect.domain.product.repository.ProductRepository;
 import com.springboot.bizconnect.entity.Product;
 
 import jakarta.transaction.Transactional;

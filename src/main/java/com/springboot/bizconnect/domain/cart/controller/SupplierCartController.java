@@ -30,8 +30,8 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/admin/cart")
-@Tag(name = "AdminCart", description = "운영 관리자 장바구니 관련 API")
-public class AdminCartController {
+@Tag(name = "SupplierCart", description = "공급사 장바구니 관련 API")
+public class SupplierCartController {
 	private final AdminCartService admincartservice;
 	
 	// 기존 데이터가 없으면 생성 있으면 추가입니다.

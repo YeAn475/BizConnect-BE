@@ -9,13 +9,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.springboot.bizconnect.domain.auth.CustomUserDetails;
 import com.springboot.bizconnect.domain.cart.dto.detail.CompanyProductDetailResponseDto;
-import com.springboot.bizconnect.domain.cart.dto.detail.CompanyProductDetailRequestDto;
 import com.springboot.bizconnect.domain.cart.service.CartService;
 import com.springboot.bizconnect.domain.product.dto.list.ProductListRequestDto;
 import com.springboot.bizconnect.domain.product.dto.list.ProductListResponseDto;
@@ -27,8 +25,8 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/cart")
-@Tag(name = "Cart", description = "장바구니 관련 API")
-public class CartController {
+@Tag(name = "BuyerCart", description = "구매사 장바구니 관련 API")
+public class BuyerCartController {
 	private final CartService cartService;
 	
 	/*
