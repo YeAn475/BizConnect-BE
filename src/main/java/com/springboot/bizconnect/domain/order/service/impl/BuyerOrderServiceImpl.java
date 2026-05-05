@@ -149,7 +149,34 @@ public class BuyerOrderServiceImpl implements BuyerOrderService {
 
     @Override
     public BuyerOrderDetailResponseDto orderDetail(CustomUserDetails userDetails, BuyerOrderDetailRequestDto requestDto) {
-        return null;
+        User user = userRepository.findById(userDetails.getUser().getUserNo())
+                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
+
+        Order order = orderRepository.findById(requestDto.getOrderNo())
+                .orElseThrow(() -> new RuntimeException("주문을 찾을 수 없습니다."));
+
+        // 본인 회사 주문인지 확인
+        if (!order.getBuyerCompany().getCompanyNo().equals(user.getCompany().getCompanyNo())) {
+            throw new RuntimeException("조회 권한이 없습니다.");
+        }
+
+        List<OrderItem> orderItems = orderItemRepository.findByOrder_OrderNo(requestDto.getOrderNo());
+
+        List<BuyerOrderDetailResponseDto.OrderItemDetailDto> items = orderItems.stream()
+                .map(item -> BuyerOrderDetailResponseDto.OrderItemDetailDto.builder()
+                        .productNo(item.getProduct().getProductNo())
+                        .productName(item.getProduct().getName())
+                        .quantity(item.getQuantity())
+                        .build())
+                .toList();
+
+        return BuyerOrderDetailResponseDto.builder()
+                .orderNo(order.getOrderNo())
+                .supplierCompanyName(order.getSupplierCompany().getName())
+                .status(order.getStatus().name())
+                .createdAt(order.getCreatedAt())
+                .orderItems(items)
+                .build();
     }
 
     @Override

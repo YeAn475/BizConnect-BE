@@ -91,7 +91,7 @@ public class BuyerOrderController {
         return ResponseEntity.ok(responseDto);
     }
 
-    @GetMapping("/{orderNo}")
+    @GetMapping("/{orderNo}/status")
     @Operation(summary = "주문 상태 보기", description = "내가 넣은 주문상태 상세히 확인합니다.")
     public ResponseEntity<BuyerOrderStatusResponseDto> orderStatusDetail(
             @AuthenticationPrincipal CustomUserDetails userDetails,
