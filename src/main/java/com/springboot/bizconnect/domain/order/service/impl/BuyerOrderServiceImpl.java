@@ -1,5 +1,11 @@
 package com.springboot.bizconnect.domain.order.service.impl;
 
+import com.springboot.bizconnect.domain.order.dto.cancel.OrderCancelRequestDto;
+import com.springboot.bizconnect.domain.order.dto.cancel.OrderCancelResponseDto;
+import com.springboot.bizconnect.domain.order.dto.detail.BuyerOrderDetailRequestDto;
+import com.springboot.bizconnect.domain.order.dto.detail.BuyerOrderDetailResponseDto;
+import com.springboot.bizconnect.domain.order.dto.status.BuyerOrderStatusRequestDto;
+import com.springboot.bizconnect.domain.order.dto.status.BuyerOrderStatusResponseDto;
 import com.springboot.bizconnect.entity.User;
 import com.springboot.bizconnect.entity.Order;
 import com.springboot.bizconnect.entity.Company;
@@ -137,5 +143,20 @@ public class BuyerOrderServiceImpl implements BuyerOrderService {
                         .build())
                 .getContent();
 
+    }
+
+    @Override
+    public BuyerOrderDetailResponseDto orderDetail(CustomUserDetails userDetails, BuyerOrderDetailRequestDto requestDto) {
+        return null;
+    }
+
+    @Override
+    public BuyerOrderStatusResponseDto orderStatusDetail(CustomUserDetails userDetails, BuyerOrderStatusRequestDto requestDto) {
+        return null;
+    }
+
+    @Override
+    public OrderCancelResponseDto orderCancel(CustomUserDetails userDetails, OrderCancelRequestDto requestDto) {
+        return null;
     }
 }

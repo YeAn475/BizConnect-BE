@@ -10,4 +10,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/order")
 @Tag(name = "SupplierOrder", description = "주문 관련 API")
 public class SupplierOrderController {
+    /*
+    발주받은이력확인
+
+    발주상태 변경
+
+    특정회사받은이력확인
+
+    이력상세보기
+     */
 }

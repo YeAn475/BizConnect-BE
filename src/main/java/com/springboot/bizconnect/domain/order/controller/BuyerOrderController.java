@@ -1,8 +1,14 @@
 package com.springboot.bizconnect.domain.order.controller;
 
 import com.springboot.bizconnect.domain.auth.CustomUserDetails;
+import com.springboot.bizconnect.domain.order.dto.cancel.OrderCancelRequestDto;
+import com.springboot.bizconnect.domain.order.dto.cancel.OrderCancelResponseDto;
 import com.springboot.bizconnect.domain.order.dto.create.CreateOrderRequestDto;
 import com.springboot.bizconnect.domain.order.dto.create.CreateOrderResponseDto;
+import com.springboot.bizconnect.domain.order.dto.detail.BuyerOrderDetailRequestDto;
+import com.springboot.bizconnect.domain.order.dto.detail.BuyerOrderDetailResponseDto;
+import com.springboot.bizconnect.domain.order.dto.status.BuyerOrderStatusRequestDto;
+import com.springboot.bizconnect.domain.order.dto.status.BuyerOrderStatusResponseDto;
 import com.springboot.bizconnect.domain.order.dto.list.BuyerOrderListRequestDto;
 import com.springboot.bizconnect.domain.order.dto.list.BuyerOrderListResponseDto;
 import com.springboot.bizconnect.domain.order.service.BuyerOrderService;
@@ -14,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,7 +35,7 @@ public class BuyerOrderController {
 
     private final BuyerOrderService buyerOrderService;
     /*
-    - 주문 생성 (공급사에 상품 주문)
+    - 주문 생성(발주) (공급사에 상품 주문)
       POST /api/order
       param: supplierCompanyNo, List<productNo, quantity>
 
@@ -45,9 +52,11 @@ public class BuyerOrderController {
       param: page, size
 
       - 주문 이력 상세 보기
-     */
 
-    // 내가 생각하는 발주 입력이 아님(한번 어떤식으로 해야 할지 물어보기)
+
+      주문 상태 보기 vs 주문 상세 보기
+      현재 주문 상태 즉 pending인지 확인 vs 본인 회사가 어떤 목록의 주문을 했는지 확인
+     */
     @PostMapping("/")
     @Operation(summary = "발주", description = "회사에서 공급사에 발주를 넣습니다.")
     public ResponseEntity<CreateOrderResponseDto> createOrder(
@@ -65,6 +74,36 @@ public class BuyerOrderController {
             @ParameterObject BuyerOrderListRequestDto requestDto
     ) {
         List<BuyerOrderListResponseDto> responseDto = buyerOrderService.OrderList(userDetails, requestDto);
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @GetMapping("/{orderNo}")
+    @Operation(summary = "주문 상세 보기", description = "내가 넣은 주문내역을 상세히 확인합니다.")
+    public ResponseEntity<BuyerOrderDetailResponseDto> orderDetail(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @ParameterObject BuyerOrderDetailRequestDto requestDto
+            ) {
+        BuyerOrderDetailResponseDto responseDto = buyerOrderService.orderDetail(userDetails, requestDto);
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @GetMapping("/{orderNo}")
+    @Operation(summary = "주문 상태 보기", description = "내가 넣은 주문상태 상세히 확인합니다.")
+    public ResponseEntity<BuyerOrderStatusResponseDto> orderStatusDetail(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @ParameterObject BuyerOrderStatusRequestDto requestDto
+    ) {
+        BuyerOrderStatusResponseDto responseDto = buyerOrderService.orderStatusDetail(userDetails, requestDto);
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @PutMapping("/{orderNo}/cancel")
+    @Operation(summary = "주문 취소", description = "내가 넣은 주문을 취소합니다.")
+    public ResponseEntity<OrderCancelResponseDto> orderCancel(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @ParameterObject OrderCancelRequestDto requestDto
+    ) {
+        OrderCancelResponseDto responseDto = buyerOrderService.orderCancel(userDetails, requestDto);
         return ResponseEntity.ok(responseDto);
     }
 }
