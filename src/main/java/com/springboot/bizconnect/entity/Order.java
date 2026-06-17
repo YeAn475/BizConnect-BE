@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "order")
+@Table(name = "`order`")
 @Getter
 @Setter
 @Builder
