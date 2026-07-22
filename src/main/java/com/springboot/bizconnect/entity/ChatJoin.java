@@ -11,6 +11,7 @@ import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -39,9 +40,14 @@ public class ChatJoin {
     private Chatroom chatroom;
 
     @Column(name = "last_read_message_no")
-    private Integer lastReadMessageNo;
+    private Long lastReadMessageNo;
 
     @Embeddable
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @EqualsAndHashCode
     public static class chatJoinNo implements Serializable {
         @Column(name = "user_no", nullable = false)
         private Long userNo;

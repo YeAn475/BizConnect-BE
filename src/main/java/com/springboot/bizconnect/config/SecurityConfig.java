@@ -44,6 +44,7 @@ public class SecurityConfig {
                     auth.requestMatchers("/api/user/signup").permitAll();
                     auth.requestMatchers("/api/user/password/reset").permitAll();
                     auth.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll();
+                    auth.requestMatchers("/ws/**").permitAll();
                     auth.anyRequest().authenticated();
                 });
 
